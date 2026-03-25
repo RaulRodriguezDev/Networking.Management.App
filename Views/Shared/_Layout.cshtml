@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - NetMonitor</title>
+    <link rel="stylesheet" href="/css/bundle.css" />
+</head>
+<body>
+    <aside id="location-sidebar" class="sidebar">
+        <div class="sidebar__header">
+            <div class="sidebar__logo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                    <path d="M2 17l10 5 10-5" />
+                    <path d="M2 12l10 5 10-5" />
+                </svg>
+                <h1>NetMonitor</h1>
+            </div>
+            <p class="sidebar__subtitle">Hospital Network Management</p>
+        </div>
+
+        <div class="sidebar__search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <input type="text" id="location-search" placeholder="Search locations…" />
+        </div>
+
+        <nav id="location-list" class="sidebar__nav" role="navigation" aria-label="Hospital locations"></nav>
+
+        <div class="sidebar__footer">
+            <div class="sidebar__status-badge online"></div>
+            <span>System Online</span>
+        </div>
+    </aside>
+
+    <main id="main-content" class="main">
+        <header class="topbar">
+            <div class="topbar__left">
+                <button id="btn-toggle-left" class="topbar__btn" title="Toggle locations">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18" />
+                    </svg>
+                </button>
+                <h2 id="topbar-title">Select a location</h2>
+            </div>
+            <div class="topbar__right">
+                <span id="equipment-count" class="badge">0 devices</span>
+                <span id="online-count" class="badge badge--green">0 online</span>
+                <span id="offline-count" class="badge badge--red">0 offline</span>
+            </div>
+        </header>
+
+        <div class="main__content">
+            @RenderBody()
+        </div>
+
+        <footer class="footer">
+            &copy; @DateTime.Now.Year - NetMonitor &middot;
+            <a asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </footer>
+    </main>
+
+    <script src="/js/bundle.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
