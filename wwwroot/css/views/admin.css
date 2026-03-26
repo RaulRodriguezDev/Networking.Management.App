@@ -1,0 +1,67 @@
+/* ===== Admin Page ===== */
+.admin {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.admin__header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.admin__header svg {
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.admin__header h2 {
+    font-size: 1.3rem;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.admin__header p {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+}
+
+.admin__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+}
+
+.admin__card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: border-color var(--transition), background var(--transition);
+    cursor: default;
+}
+
+.admin__card:hover {
+    border-color: var(--accent);
+    background: var(--bg-card-hover);
+}
+
+.admin__card svg {
+    color: var(--accent);
+}
+
+.admin__card h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.admin__card p {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}

@@ -193,6 +193,36 @@ body {
     color: var(--text-muted);
 }
 
+/* ===== Sidebar Admin Button ===== */
+.sidebar__admin {
+    padding: 8px 8px 0;
+    border-top: 1px solid var(--border);
+}
+
+.sidebar__admin-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background var(--transition), color var(--transition);
+}
+
+.sidebar__admin-btn:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+}
+
+.sidebar__admin-btn svg {
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
 .sidebar__status-badge {
     width: 8px;
     height: 8px;
@@ -280,6 +310,45 @@ body {
     background: var(--red-bg);
     color: var(--red);
     border-color: transparent;
+}
+
+/* ===== Topbar User ===== */
+.topbar__separator {
+    width: 1px;
+    height: 24px;
+    background: var(--border);
+    margin: 0 4px;
+}
+
+.topbar__user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.topbar__user-icon {
+    color: var(--accent);
+}
+
+.topbar__user-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.topbar__user-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    transition: color var(--transition);
+}
+
+.topbar__user-link:hover {
+    color: var(--text-primary);
 }
 
 
