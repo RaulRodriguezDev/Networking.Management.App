@@ -4,48 +4,66 @@ document.addEventListener('DOMContentLoaded', function () {
     var searchInput = document.getElementById('location-search');
     var locationList = document.getElementById('location-list');
 
-    // Sample hospital locations (replace with API calls later)
-    var locations = [
-        { id: 1, name: 'Emergency Room',   floor: 'Ground Floor', status: 'online' },
-        { id: 2, name: 'Radiology',        floor: '1st Floor',    status: 'online' },
-        { id: 3, name: 'ICU',              floor: '2nd Floor',    status: 'warning' },
-        { id: 4, name: 'Operating Rooms',  floor: '2nd Floor',    status: 'online' },
-        { id: 5, name: 'Pharmacy',         floor: 'Ground Floor', status: 'online' },
-        { id: 6, name: 'Laboratory',       floor: '1st Floor',    status: 'offline' },
-        { id: 7, name: 'Administration',   floor: '3rd Floor',    status: 'online' },
-        { id: 8, name: 'Pediatrics',       floor: '3rd Floor',    status: 'online' }
-    ];
+    var allLocations = [];
 
     function renderLocations(filter) {
         if (!locationList) return;
 
         var filtered = filter
-            ? locations.filter(function (l) { return l.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1; })
-            : locations;
+            ? allLocations.filter(function (l) { return l.locationName.toLowerCase().indexOf(filter.toLowerCase()) !== -1; })
+            : allLocations;
+
+        if (filtered.length === 0) {
+            locationList.innerHTML = '<p class="sidebar__empty">No locations found</p>';
+            return;
+        }
 
         locationList.innerHTML = filtered.map(function (l) {
             return '<div class="sidebar__nav-item" data-id="' + l.id + '">'
                 + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'
                 + '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>'
                 + '<div class="location-info">'
-                + '<div class="location-name">' + l.name + '</div>'
-                + '<div class="location-floor">' + l.floor + '</div>'
+                + '<div class="location-name">' + l.locationName + '</div>'
+                + '<div class="location-floor">' + l.locationFloor + '</div>'
                 + '</div>'
                 + '<span class="status-dot ' + l.status + '"></span>'
                 + '</div>';
         }).join('');
+
+        locationList.querySelectorAll('.sidebar__nav-item').forEach(function (item) {
+            item.addEventListener('click', function () {
+                locationList.querySelectorAll('.sidebar__nav-item').forEach(function (i) { i.classList.remove('active'); });
+                item.classList.add('active');
+
+                var locationId = parseInt(item.dataset.id);
+                var location = allLocations.find(function (l) { return l.id === locationId; });
+                if (location) {
+                    document.dispatchEvent(new CustomEvent('locationSelected', { detail: location }));
+                }
+            });
+        });
     }
 
-    renderLocations();
+    function loadLocations() {
+        fetch('/api/locations')
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                allLocations = data;
+                renderLocations();
+            })
+            .catch(function () {
+                if (locationList) locationList.innerHTML = '<p class="sidebar__empty">Failed to load locations</p>';
+            });
+    }
 
-    // Toggle sidebar
+    loadLocations();
+
     if (toggleBtn && sidebar) {
         toggleBtn.addEventListener('click', function () {
             sidebar.classList.toggle('collapsed');
         });
     }
 
-    // Filter locations
     if (searchInput) {
         searchInput.addEventListener('input', function () {
             renderLocations(this.value);
