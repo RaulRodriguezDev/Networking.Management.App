@@ -38,6 +38,14 @@
     --red-bg: rgba(248, 113, 113, 0.12);
     --yellow: #fbbf24;
     --yellow-bg: rgba(251, 191, 36, 0.12);
+    --purple: #a78bfa;
+    --purple-bg: rgba(167, 139, 250, 0.14);
+    --cyan: #22d3ee;
+    --cyan-bg: rgba(34, 211, 238, 0.14);
+    --orange: #fb923c;
+    --orange-bg: rgba(251, 146, 60, 0.14);
+    --pink: #f472b6;
+    --pink-bg: rgba(244, 114, 182, 0.14);
     --sidebar-w: 280px;
     --radius: 10px;
     --radius-sm: 6px;
@@ -450,3 +458,69 @@ body {
 .footer a:hover {
     text-decoration: underline;
 }
+
+/* ===== Pagination (shared across admin tables) ===== */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.pagination:empty {
+    display: none;
+}
+
+.pagination__info {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.pagination__controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+}
+
+.pagination__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 8px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.pagination__btn:hover:not(:disabled) {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+    border-color: var(--accent);
+}
+
+.pagination__btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pagination__page--active {
+    background: rgba(99, 138, 217, 0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.pagination__ellipsis {
+    color: var(--text-muted);
+    padding: 0 4px;
+    user-select: none;
+}
+

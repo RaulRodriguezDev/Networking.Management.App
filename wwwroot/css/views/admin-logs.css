@@ -70,6 +70,54 @@
     color: var(--accent);
 }
 
+/* ===== Filter Toolbar ===== */
+.logs__toolbar {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.logs__field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+    min-width: 140px;
+}
+
+.logs__field label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+}
+
+.logs__field input {
+    padding: 8px 11px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 0.84rem;
+    outline: none;
+    transition: border-color var(--transition);
+}
+
+.logs__field input:focus {
+    border-color: var(--border-active);
+}
+
+.logs__clear {
+    flex-shrink: 0;
+    height: 36px;
+}
+
 /* ===== Table ===== */
 .logs__table-wrap {
     background: var(--bg-card);
@@ -110,6 +158,10 @@
     background: var(--bg-card-hover);
 }
 
+.logs__table tbody tr {
+    animation: row-in 0.3s ease backwards;
+}
+
 .logs__time {
     white-space: nowrap;
     color: var(--text-muted);
@@ -134,12 +186,22 @@
 
 /* ===== Category Badges ===== */
 .log-badge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     padding: 3px 10px;
     border-radius: 20px;
     font-size: 0.7rem;
     font-weight: 600;
     white-space: nowrap;
+}
+
+.log-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
 }
 
 .log-badge--auth {

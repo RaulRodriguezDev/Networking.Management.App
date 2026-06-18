@@ -29,6 +29,35 @@
         }
     </div>
 
+    <div class="logs__toolbar">
+        <div class="logs__field">
+            <label for="filter-user">User</label>
+            <input type="text" id="filter-user" placeholder="Filter by username…" autocomplete="off" />
+        </div>
+        <div class="logs__field">
+            <label for="filter-device">Device</label>
+            <input type="text" id="filter-device" placeholder="Filter by device…" autocomplete="off" />
+        </div>
+        <div class="logs__field">
+            <label for="filter-action">Action</label>
+            <input type="text" id="filter-action" placeholder="Filter by action…" autocomplete="off" />
+        </div>
+        <div class="logs__field">
+            <label for="filter-from">From</label>
+            <input type="date" id="filter-from" />
+        </div>
+        <div class="logs__field">
+            <label for="filter-to">To</label>
+            <input type="date" id="filter-to" />
+        </div>
+        <button type="button" class="btn btn--ghost logs__clear" id="filter-clear">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+            <span>Clear filters</span>
+        </button>
+    </div>
+
     <div class="logs__table-wrap">
         <table class="logs__table">
             <thead>
@@ -46,4 +75,6 @@
             </tbody>
         </table>
     </div>
+
+    <div class="pagination" id="logs-pagination"></div>
 </section>

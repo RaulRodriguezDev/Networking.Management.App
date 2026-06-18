@@ -87,10 +87,19 @@
     background: var(--bg-card-hover);
 }
 
+.users__table tbody tr {
+    animation: row-in 0.3s ease backwards;
+}
+
+@keyframes row-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
 .users__table-actions,
 .users__row-actions {
     text-align: right;
-    width: 110px;
+    width: 140px;
 }
 
 .users__row-actions {
@@ -107,11 +116,21 @@
 
 /* ===== Role Badges ===== */
 .role-badge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     padding: 3px 10px;
     border-radius: 20px;
     font-size: 0.72rem;
     font-weight: 600;
+}
+
+.role-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
 }
 
 .role-badge--admin {
@@ -150,6 +169,16 @@
 
 .btn--primary:hover {
     background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(99, 138, 217, 0.3);
+}
+
+.btn svg {
+    transition: transform var(--transition);
+}
+
+.btn--primary:hover svg {
+    transform: scale(1.15) rotate(90deg);
 }
 
 .btn--ghost {
@@ -183,16 +212,30 @@
     border: 1px solid var(--border);
     color: var(--text-secondary);
     cursor: pointer;
-    transition: background var(--transition), color var(--transition);
+    transition: background var(--transition), color var(--transition), border-color var(--transition), transform var(--transition);
 }
 
 .icon-btn:hover {
     background: var(--bg-card-hover);
     color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.icon-btn--edit:hover {
+    background: rgba(99, 138, 217, 0.14);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.icon-btn--logs:hover {
+    background: var(--purple-bg);
+    border-color: var(--purple);
+    color: var(--purple);
 }
 
 .icon-btn--danger:hover {
     background: var(--red-bg);
+    border-color: var(--red);
     color: var(--red);
 }
 

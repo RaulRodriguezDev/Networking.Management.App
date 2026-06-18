@@ -24,62 +24,73 @@
     <div class="admin__grid">
         @if (User.IsInRole("Admin"))
         {
-            <a asp-controller="Admin" asp-action="Users" class="admin__card admin__card--link">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2">
-                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M23 21v-2a4 4 0 00-3-3.87" />
-                    <path d="M16 3.13a4 4 0 010 7.75" />
-                </svg>
+            <a asp-controller="Admin" asp-action="Users" class="admin__card admin__card--link admin__card--users">
+                <span class="admin__card-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                        <path d="M16 3.13a4 4 0 010 7.75" />
+                    </svg>
+                </span>
                 <h3>User Management</h3>
                 <p>Add, edit, or remove user accounts and assign roles.</p>
             </a>
         }
 
-        <div class="admin__card">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2">
-                <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
-                <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
-                <line x1="6" y1="6" x2="6.01" y2="6" />
-                <line x1="6" y1="18" x2="6.01" y2="18" />
-            </svg>
+        <div class="admin__card admin__card--devices">
+            <span class="admin__card-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
+                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
+                    <line x1="6" y1="6" x2="6.01" y2="6" />
+                    <line x1="6" y1="18" x2="6.01" y2="18" />
+                </svg>
+            </span>
             <h3>Network Devices</h3>
             <p>Register new devices, update configurations, and remove decommissioned equipment.</p>
         </div>
 
-        <a asp-controller="Admin" asp-action="Locations" class="admin__card admin__card--link">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                <circle cx="12" cy="10" r="3" />
-            </svg>
+        <a asp-controller="Admin" asp-action="Locations" class="admin__card admin__card--link admin__card--locations">
+            <span class="admin__card-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                </svg>
+            </span>
             <h3>Locations</h3>
             <p>Manage hospital departments, floors, and network zones.</p>
         </a>
 
-        <div class="admin__card">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2">
-                <path d="M12 20V10" />
-                <path d="M18 20V4" />
-                <path d="M6 20v-4" />
-            </svg>
+        <div class="admin__card admin__card--reports">
+            <span class="admin__card-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2">
+                    <path d="M12 20V10" />
+                    <path d="M18 20V4" />
+                    <path d="M6 20v-4" />
+                </svg>
+            </span>
             <h3>Reports</h3>
             <p>View uptime reports, device health history, and network analytics.</p>
         </div>
 
-        <a asp-controller="Admin" asp-action="Logs" class="admin__card admin__card--link">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                <path d="M14 2v6h6" />
-                <path d="M16 13H8M16 17H8M10 9H8" />
-            </svg>
+        <a asp-controller="Admin" asp-action="Logs" class="admin__card admin__card--link admin__card--logs">
+            <span class="admin__card-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                    <path d="M14 2v6h6" />
+                    <path d="M16 13H8M16 17H8M10 9H8" />
+                </svg>
+            </span>
             <h3>Activity Logs</h3>
             <p>Review application, authentication, and device activity logs.</p>
         </a>
     </div>
 </section>
+
 

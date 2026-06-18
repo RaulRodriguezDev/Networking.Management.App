@@ -24,14 +24,6 @@ namespace Network.Management.App.Controllers.Api
             return Ok(logs);
         }
 
-        [HttpGet("by-user/{userId:int}")]
-        [Authorize(Policy = AppRoles.AdminOnly)]
-        public async Task<IActionResult> GetByUser(int userId)
-        {
-            var logs = await _logService.GetLogsByUserAsync(userId);
-            return Ok(logs);
-        }
-
         // Admins see every category; IT users do not see auth (user-account) logs.
         private string[] AllowedCategories() =>
             User.IsInRole(AppRoles.Admin)

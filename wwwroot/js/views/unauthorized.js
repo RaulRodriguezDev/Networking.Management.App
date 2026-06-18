@@ -32,4 +32,9 @@ document.addEventListener('DOMContentLoaded', function () {
             closeModal();
         }
     });
+
+    // Auto-open the login modal when arriving via the "Not signed in" link (?login=1).
+    if (new URLSearchParams(window.location.search).get('login') === '1') {
+        openModal();
+    }
 });

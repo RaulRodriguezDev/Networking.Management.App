@@ -54,15 +54,6 @@ namespace Network.Management.App.Services
             return logs;
         }
 
-        public async Task<IEnumerable<LogDto>> GetLogsByUserAsync(int userId)
-        {
-            return await QueryWithCategory()
-                .Where(x => x.Log.UserId == userId)
-                .OrderByDescending(x => x.Log.CreatedAt)
-                .Select(ProjectExpression)
-                .ToListAsync();
-        }
-
         private IQueryable<LogWithCategory> QueryWithCategory()
         {
             return _context.Logs.Select(l => new LogWithCategory

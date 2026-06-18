@@ -87,6 +87,10 @@
     background: var(--bg-card-hover);
 }
 
+.locations__table tbody tr {
+    animation: row-in 0.3s ease backwards;
+}
+
 .locations__table-actions,
 .locations__row-actions {
     text-align: right;
@@ -107,11 +111,21 @@
 
 /* ===== Status Badges ===== */
 .status-badge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     padding: 3px 10px;
     border-radius: 20px;
     font-size: 0.72rem;
     font-weight: 600;
+}
+
+.status-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
 }
 
 .status-badge--online {

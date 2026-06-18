@@ -23,6 +23,12 @@ document.addEventListener('DOMContentLoaded', function () {
         unknown: 'No devices'
     };
 
+    var paginator = window.createPaginator({
+        container: document.getElementById('locations-pagination'),
+        pageSize: 10,
+        onRender: renderLocations
+    });
+
     // ===== Modal helpers =====
     function openModal(modal) { modal.classList.add('modal--open'); modal.setAttribute('aria-hidden', 'false'); }
     function closeModal(modal) { modal.classList.remove('modal--open'); modal.setAttribute('aria-hidden', 'true'); }
@@ -46,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
         tbody.innerHTML = '<tr><td colspan="5" class="locations__empty">Loading…</td></tr>';
         fetch('/api/locations')
             .then(function (res) { return res.json(); })
-            .then(function (locations) { renderLocations(locations); })
+            .then(function (locations) { paginator.setItems(locations); })
             .catch(function () {
                 tbody.innerHTML = '<tr><td colspan="5" class="locations__empty">Failed to load locations.</td></tr>';
                 window.showToast('Failed to load locations.', 'error');
@@ -67,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 + '<td>' + l.totalDevices + ' (' + l.onlineDevices + ' online, ' + l.offlineDevices + ' offline)</td>'
                 + '<td><span class="status-badge status-badge--' + l.status + '">' + statusLabel + '</span></td>'
                 + '<td class="locations__row-actions">'
-                + '<button class="icon-btn" data-edit="' + l.id + '" title="Edit">'
+                + '<button class="icon-btn icon-btn--edit" data-edit="' + l.id + '" title="Edit">'
                 + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'
                 + '</button>'
                 + '<button class="icon-btn icon-btn--danger" data-delete="' + l.id + '" data-name="' + escapeHtml(l.locationName) + '" title="Delete">'

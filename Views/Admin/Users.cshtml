@@ -39,6 +39,8 @@
             </tbody>
         </table>
     </div>
+
+    <div class="pagination" id="users-pagination"></div>
 </section>
 
 <!-- ===== Add / Edit Modal ===== -->
@@ -115,27 +117,5 @@
     </div>
 </div>
 
-<!-- ===== User Logs Modal ===== -->
-<div class="modal" id="user-logs-modal" aria-hidden="true">
-    <div class="modal__backdrop" data-close-modal></div>
-    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="user-logs-modal-title">
-        <div class="modal__header">
-            <h3 id="user-logs-modal-title">Activity Logs</h3>
-            <button type="button" class="modal__close" data-close-modal aria-label="Close">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-        <div class="modal__body">
-            <div class="user-logs__list" id="user-logs-list">
-                <p class="user-logs__empty">Loading…</p>
-            </div>
-        </div>
-        <div class="modal__footer">
-            <button type="button" class="btn btn--ghost" data-close-modal>Close</button>
-        </div>
-    </div>
-</div>
 
 

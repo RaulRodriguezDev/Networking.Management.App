@@ -126,3 +126,26 @@
     color: var(--text-muted);
     font-family: monospace;
 }
+
+.device-card__logs {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    margin-top: 2px;
+    padding: 5px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.76rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.device-card__logs:hover {
+    background: var(--purple-bg);
+    border-color: var(--purple);
+    color: var(--purple);
+}

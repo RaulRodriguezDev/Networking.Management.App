@@ -34,6 +34,7 @@
 }
 
 .admin__card {
+    position: relative;
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -41,8 +42,21 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    transition: border-color var(--transition), background var(--transition);
+    overflow: hidden;
+    transition: border-color var(--transition), background var(--transition), transform var(--transition), box-shadow var(--transition);
     cursor: default;
+    animation: admin-card-in 0.4s ease backwards;
+}
+
+.admin__card:nth-child(1) { animation-delay: 0.04s; }
+.admin__card:nth-child(2) { animation-delay: 0.08s; }
+.admin__card:nth-child(3) { animation-delay: 0.12s; }
+.admin__card:nth-child(4) { animation-delay: 0.16s; }
+.admin__card:nth-child(5) { animation-delay: 0.20s; }
+
+@keyframes admin-card-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 .admin__card:hover {
@@ -50,8 +64,21 @@
     background: var(--bg-card-hover);
 }
 
-.admin__card svg {
+/* Colored icon chip */
+.admin__card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
     color: var(--accent);
+    background: rgba(99, 138, 217, 0.14);
+    transition: transform var(--transition);
+}
+
+.admin__card svg {
+    color: inherit;
 }
 
 .admin__card h3 {
@@ -72,5 +99,46 @@
 }
 
 .admin__card--link:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
 }
+
+.admin__card--link:hover .admin__card-icon {
+    transform: scale(1.08) rotate(-4deg);
+}
+
+/* Per-card accent colors */
+.admin__card--users .admin__card-icon {
+    color: var(--purple);
+    background: var(--purple-bg);
+}
+
+.admin__card--users:hover { border-color: var(--purple); }
+
+.admin__card--devices .admin__card-icon {
+    color: var(--cyan);
+    background: var(--cyan-bg);
+}
+
+.admin__card--devices:hover { border-color: var(--cyan); }
+
+.admin__card--locations .admin__card-icon {
+    color: var(--green);
+    background: var(--green-bg);
+}
+
+.admin__card--locations:hover { border-color: var(--green); }
+
+.admin__card--reports .admin__card-icon {
+    color: var(--orange);
+    background: var(--orange-bg);
+}
+
+.admin__card--reports:hover { border-color: var(--orange); }
+
+.admin__card--logs .admin__card-icon {
+    color: var(--pink);
+    background: var(--pink-bg);
+}
+
+.admin__card--logs:hover { border-color: var(--pink); }
