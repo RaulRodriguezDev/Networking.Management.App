@@ -1,0 +1,49 @@
+@{
+    ViewData["Title"] = "Activity Logs";
+    var isAdmin = User.IsInRole("Admin");
+}
+
+<section class="logs" id="logs-page">
+    <div class="logs__header">
+        <div class="logs__header-info">
+            <a asp-controller="Admin" asp-action="Index" class="logs__back" title="Back to Administration">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5" />
+                    <path d="M12 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div>
+                <h2>Activity Logs</h2>
+                <p>Review application, authentication, and device activity recorded across the system.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="logs__filters" id="logs-filters">
+        <button type="button" class="logs__tab logs__tab--active" data-category="">All</button>
+        <button type="button" class="logs__tab" data-category="app">Application</button>
+        <button type="button" class="logs__tab" data-category="device">Devices</button>
+        @if (isAdmin)
+        {
+            <button type="button" class="logs__tab" data-category="auth">Authentication</button>
+        }
+    </div>
+
+    <div class="logs__table-wrap">
+        <table class="logs__table">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Category</th>
+                    <th>Action</th>
+                    <th>Details</th>
+                    <th>User</th>
+                    <th>Device</th>
+                </tr>
+            </thead>
+            <tbody id="logs-tbody">
+                <tr><td colspan="6" class="logs__empty">Loading…</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>

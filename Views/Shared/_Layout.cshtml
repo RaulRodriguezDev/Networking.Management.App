@@ -30,7 +30,7 @@
 
         <nav id="location-list" class="sidebar__nav" role="navigation" aria-label="Hospital locations"></nav>
 
-        @if (User.IsInRole("Admin"))
+        @if (User.IsInRole("Admin") || User.IsInRole("IT"))
         {
             <div class="sidebar__admin">
                 <a asp-controller="Admin" asp-action="Index" class="sidebar__admin-btn">

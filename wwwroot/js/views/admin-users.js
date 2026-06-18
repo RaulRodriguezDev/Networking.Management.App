@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var tbody = document.getElementById('users-tbody');
     var userModal = document.getElementById('user-modal');
     var deleteModal = document.getElementById('delete-modal');
+    var userLogsModal = document.getElementById('user-logs-modal');
+    var userLogsList = document.getElementById('user-logs-list');
+    var userLogsTitle = document.getElementById('user-logs-modal-title');
     var roleCards = document.getElementById('role-cards');
 
     var form = {
@@ -36,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
         el.addEventListener('click', function () {
             closeModal(userModal);
             closeModal(deleteModal);
+            closeModal(userLogsModal);
         });
     });
 
@@ -43,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.key === 'Escape') {
             closeModal(userModal);
             closeModal(deleteModal);
+            closeModal(userLogsModal);
         }
     });
 
@@ -99,6 +104,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 + '<td>' + escapeHtml(u.username) + '</td>'
                 + '<td><span class="role-badge role-badge--' + u.roleName.toLowerCase() + '">' + escapeHtml(u.roleName) + '</span></td>'
                 + '<td class="users__row-actions">'
+                + '<button class="icon-btn" data-logs="' + u.userId + '" data-username="' + escapeHtml(u.username) + '" title="View logs">'
+                + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/></svg>'
+                + '</button>'
                 + '<button class="icon-btn" data-edit="' + u.userId + '" title="Edit">'
                 + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'
                 + '</button>'
@@ -114,6 +122,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         tbody.querySelectorAll('[data-delete]').forEach(function (btn) {
             btn.addEventListener('click', function () { openDeleteModal(parseInt(btn.dataset.delete), btn.dataset.username); });
+        });
+        tbody.querySelectorAll('[data-logs]').forEach(function (btn) {
+            btn.addEventListener('click', function () { openUserLogsModal(parseInt(btn.dataset.logs), btn.dataset.username); });
         });
     }
 
@@ -225,6 +236,46 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(function () { window.showToast('Failed to delete user.', 'error'); })
             .finally(function () { pendingDeleteId = null; });
     });
+
+    // ===== View user logs =====
+    function openUserLogsModal(userId, username) {
+        userLogsTitle.textContent = 'Activity Logs — ' + username;
+        userLogsList.innerHTML = '<p class="user-logs__empty">Loading…</p>';
+        openModal(userLogsModal);
+
+        fetch('/api/logs/by-user/' + userId)
+            .then(function (res) {
+                if (!res.ok) throw new Error('Request failed.');
+                return res.json();
+            })
+            .then(function (logs) { renderUserLogs(logs); })
+            .catch(function () {
+                userLogsList.innerHTML = '<p class="user-logs__empty">Failed to load logs.</p>';
+                window.showToast('Failed to load user logs.', 'error');
+            });
+    }
+
+    function renderUserLogs(logs) {
+        if (!logs.length) {
+            userLogsList.innerHTML = '<p class="user-logs__empty">No activity recorded for this user.</p>';
+            return;
+        }
+
+        userLogsList.innerHTML = logs.map(function (log) {
+            return '<div class="user-logs__item">'
+                + '<div class="user-logs__item-head">'
+                + '<span class="user-logs__action">' + escapeHtml(log.actionType) + '</span>'
+                + '<span class="user-logs__time">' + formatDate(log.createdAt) + '</span>'
+                + '</div>'
+                + '<div class="user-logs__details">' + escapeHtml(log.details) + '</div>'
+                + '</div>';
+        }).join('');
+    }
+
+    function formatDate(iso) {
+        var d = new Date(iso);
+        return isNaN(d.getTime()) ? iso : d.toLocaleString();
+    }
 
     function escapeHtml(str) {
         var div = document.createElement('div');

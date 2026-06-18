@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Network.Management.App.Services;
 
 namespace Network.Management.App.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = AppRoles.AdminOrIT)]
     public class AdminController : Controller
     {
         public IActionResult Index()
@@ -11,9 +12,21 @@ namespace Network.Management.App.Controllers
             return View();
         }
 
+        [Authorize(Policy = AppRoles.AdminOnly)]
         public IActionResult Users()
+        {
+            return View();
+        }
+
+        public IActionResult Locations()
+        {
+            return View();
+        }
+
+        public IActionResult Logs()
         {
             return View();
         }
     }
 }
+

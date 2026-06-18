@@ -41,5 +41,19 @@ namespace Network.Management.App.Services
                 UserId = userId
             });
         }
+
+        public async Task PersistDeviceAsync(string actionType, string details, int userId, int deviceId)
+        {
+            _logger.LogInformation("[{ActionType}] (device:{DeviceId}) {Details}", actionType, deviceId, details);
+
+            await _repository.AddAsync(new Log
+            {
+                ActionType = actionType,
+                Details = details,
+                CreatedAt = DateTime.UtcNow,
+                UserId = userId,
+                DeviceId = deviceId
+            });
+        }
     }
 }

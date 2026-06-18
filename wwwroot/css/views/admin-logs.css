@@ -1,0 +1,208 @@
+/* ===== Activity Logs Page ===== */
+.logs {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.logs__header-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.logs__back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    transition: background var(--transition), color var(--transition);
+}
+
+.logs__back:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+}
+
+.logs__header h2 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.logs__header p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* ===== Filter Tabs ===== */
+.logs__filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.logs__tab {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.logs__tab:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+}
+
+.logs__tab--active {
+    background: rgba(99, 138, 217, 0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ===== Table ===== */
+.logs__table-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.logs__table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.logs__table thead th {
+    text-align: left;
+    padding: 13px 18px;
+    font-size: 0.73rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+}
+
+.logs__table tbody td {
+    padding: 12px 18px;
+    font-size: 0.84rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+}
+
+.logs__table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.logs__table tbody tr:hover {
+    background: var(--bg-card-hover);
+}
+
+.logs__time {
+    white-space: nowrap;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.logs__action {
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+}
+
+.logs__muted {
+    color: var(--text-muted);
+}
+
+.logs__empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 40px 18px !important;
+}
+
+/* ===== Category Badges ===== */
+.log-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.log-badge--auth {
+    background: rgba(251, 191, 36, 0.12);
+    color: var(--yellow);
+}
+
+.log-badge--device {
+    background: rgba(99, 138, 217, 0.15);
+    color: var(--accent);
+}
+
+.log-badge--app {
+    background: rgba(52, 211, 153, 0.12);
+    color: var(--green);
+}
+
+/* ===== User Logs Modal (used from Users page) ===== */
+.user-logs__list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 420px;
+    overflow-y: auto;
+}
+
+.user-logs__item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+.user-logs__item-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.user-logs__action {
+    font-family: monospace;
+    font-size: 0.78rem;
+    color: var(--text-primary);
+}
+
+.user-logs__time {
+    font-size: 0.74rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.user-logs__details {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+}
+
+.user-logs__empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 30px 14px;
+    font-size: 0.85rem;
+}

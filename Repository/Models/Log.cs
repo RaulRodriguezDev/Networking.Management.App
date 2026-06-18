@@ -9,5 +9,8 @@ namespace Network.Management.App.Repository.Models
 
         public int UserId { get; set; }
         public User User { get; set; } = null!;
+
+        public int? DeviceId { get; set; }
+        public Device? Device { get; set; }
     }
 }

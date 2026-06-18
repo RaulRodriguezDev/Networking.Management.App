@@ -13,5 +13,8 @@ namespace Network.Management.App.Services
 
         /// <summary>Logs to the console and persists the entry to the database.</summary>
         Task PersistAsync(string actionType, string details, int userId);
+
+        /// <summary>Logs to the console and persists a device-related entry to the database.</summary>
+        Task PersistDeviceAsync(string actionType, string details, int userId, int deviceId);
     }
 }

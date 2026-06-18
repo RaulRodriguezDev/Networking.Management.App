@@ -12,6 +12,7 @@ namespace Network.Management.App.Services
         public const string DeviceCreated = "DEVICE_CREATED";
         public const string DeviceUpdated = "DEVICE_UPDATED";
         public const string DeviceDeleted = "DEVICE_DELETED";
+        public const string DeviceStatusChanged = "DEVICE_STATUS_CHANGED";
 
         public const string LocationCreated = "LOCATION_CREATED";
         public const string LocationUpdated = "LOCATION_UPDATED";

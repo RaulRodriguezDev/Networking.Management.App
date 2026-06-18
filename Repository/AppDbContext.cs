@@ -58,6 +58,7 @@ namespace Network.Management.App.Repository
                 entity.Property(l => l.CreatedAt).HasColumnName("created_at").IsRequired();
                 entity.Property(l => l.Details).HasColumnName("details").IsRequired();
                 entity.Property(l => l.UserId).HasColumnName("user_id").IsRequired();
+                entity.Property(l => l.DeviceId).HasColumnName("device_id");
             });
 
             modelBuilder.Entity<Role>(entity =>
@@ -104,6 +105,12 @@ namespace Network.Management.App.Repository
                 .WithMany(u => u.Logs)
                 .HasForeignKey(l => l.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Log>()
+                .HasOne(l => l.Device)
+                .WithMany()
+                .HasForeignKey(l => l.DeviceId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Device>()
                 .HasOne(d => d.DeviceType)

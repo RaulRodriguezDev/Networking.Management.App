@@ -141,11 +141,17 @@ namespace Network.Management.App.Migrations
                         .HasColumnType("text")
                         .HasColumnName("details");
 
+                    b.Property<int?>("DeviceId")
+                        .HasColumnType("integer")
+                        .HasColumnName("device_id");
+
                     b.Property<int>("UserId")
                         .HasColumnType("integer")
                         .HasColumnName("user_id");
 
                     b.HasKey("LogId");
+
+                    b.HasIndex("DeviceId");
 
                     b.HasIndex("UserId");
 
@@ -237,11 +243,18 @@ namespace Network.Management.App.Migrations
 
             modelBuilder.Entity("Network.Management.App.Repository.Models.Log", b =>
                 {
+                    b.HasOne("Network.Management.App.Repository.Models.Device", "Device")
+                        .WithMany()
+                        .HasForeignKey("DeviceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Network.Management.App.Repository.Models.User", "User")
                         .WithMany("Logs")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Device");
 
                     b.Navigation("User");
                 });
