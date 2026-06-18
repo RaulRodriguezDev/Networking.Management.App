@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Network.Management.App.Models.DTOs;
 using Network.Management.App.Repository;
@@ -6,7 +5,6 @@ using Network.Management.App.Repository.Models;
 
 namespace Network.Management.App.Controllers.Api
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class DevicesController : ControllerBase
