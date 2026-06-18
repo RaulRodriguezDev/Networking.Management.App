@@ -55,6 +55,11 @@ namespace Network.Management.App.Services
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<bool> UsernameExistsAsync(string username)
+        {
+            return await _context.Users.AnyAsync(u => u.Username == username.ToLowerInvariant());
+        }
+
         public async Task<UserDto> CreateAsync(CreateUserDto dto, int requestingUserId)
         {
             var user = new User

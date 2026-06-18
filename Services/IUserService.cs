@@ -12,6 +12,8 @@ namespace Network.Management.App.Services
 
         Task<UserDto?> GetByIdAsync(int userId);
 
+        Task<bool> UsernameExistsAsync(string username);
+
         Task<UserDto> CreateAsync(CreateUserDto dto, int requestingUserId);
 
         Task<UserDto?> UpdateAsync(int userId, UpdateUserDto dto, int requestingUserId);

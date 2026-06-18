@@ -1,10 +1,41 @@
-document.addEventListener('DOMContentLoaded', function () {
-    var sidebar = document.getElementById('location-sidebar');
-    var toggleBtn = document.getElementById('btn-toggle-left');
-    var searchInput = document.getElementById('location-search');
-    var locationList = document.getElementById('location-list');
+// ===== Global Toast Notifications =====
+window.showToast = function (message, type) {
+    type = type || 'info';
+    var container = document.getElementById('toast-container');
+    if (!container) return;
 
-    var allLocations = [];
+    var icons = {
+        success: '<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/>',
+        error: '<circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/>',
+        info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>'
+    };
+
+    var toast = document.createElement('div');
+    toast.className = 'toast toast--' + type;
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML =
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'
+        + (icons[type] || icons.info) + '</svg>'
+        + '<span class="toast__message"></span>';
+    toast.querySelector('.toast__message').textContent = message;
+
+    container.appendChild(toast);
+
+    requestAnimationFrame(function () { toast.classList.add('toast--visible'); });
+
+    setTimeout(function () {
+        toast.classList.remove('toast--visible');
+        toast.addEventListener('transitionend', function () { toast.remove(); }, { once: true });
+    }, 4000);
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+var sidebar = document.getElementById('location-sidebar');
+var toggleBtn = document.getElementById('btn-toggle-left');
+var searchInput = document.getElementById('location-search');
+var locationList = document.getElementById('location-list');
+
+var allLocations = [];
 
     function renderLocations(filter) {
         if (!locationList) return;

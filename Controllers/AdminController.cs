@@ -10,5 +10,10 @@ namespace Network.Management.App.Controllers
         {
             return View();
         }
+
+        public IActionResult Users()
+        {
+            return View();
+        }
     }
 }
