@@ -158,6 +158,30 @@ namespace Network.Management.App.Migrations
                     b.ToTable("logs", (string)null);
                 });
 
+            modelBuilder.Entity("Network.Management.App.Repository.Models.NetworkSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("network_setting_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("RangeEnd")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("range_end");
+
+                    b.Property<string>("RangeStart")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("range_start");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("network_setting", (string)null);
+                });
+
             modelBuilder.Entity("Network.Management.App.Repository.Models.Role", b =>
                 {
                     b.Property<int>("RoleId")

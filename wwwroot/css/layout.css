@@ -524,3 +524,86 @@ body {
     user-select: none;
 }
 
+/* ===== Loading & Empty States (shared) ===== */
+.ui-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 48px 20px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+/* Brief inline placeholder rendered server-side before JS swaps in the spinner. */
+.ui-state__cell {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 32px 18px;
+    font-size: 0.85rem;
+}
+
+/* When used inside a table cell, span the full width gracefully. */
+td > .ui-state {
+    padding: 32px 20px;
+}
+
+.ui-state__text {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    max-width: 320px;
+}
+
+.ui-state--error .ui-state__icon {
+    color: var(--red);
+}
+
+.ui-state--empty .ui-state__icon {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+/* Spinner */
+.ui-spinner {
+    animation: ui-spinner-rotate 1.4s linear infinite;
+}
+
+.ui-spinner__track {
+    stroke: var(--border);
+}
+
+.ui-spinner__head {
+    stroke: var(--accent);
+    stroke-linecap: round;
+    stroke-dasharray: 90 150;
+    stroke-dashoffset: 0;
+    animation: ui-spinner-dash 1.4s ease-in-out infinite;
+}
+
+@keyframes ui-spinner-rotate {
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes ui-spinner-dash {
+    0% {
+        stroke-dasharray: 1 150;
+        stroke-dashoffset: 0;
+    }
+    50% {
+        stroke-dasharray: 90 150;
+        stroke-dashoffset: -35;
+    }
+    100% {
+        stroke-dasharray: 90 150;
+        stroke-dashoffset: -124;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ui-spinner,
+    .ui-spinner__head {
+        animation-duration: 3s;
+    }
+}
+

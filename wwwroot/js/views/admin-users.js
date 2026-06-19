@@ -83,19 +83,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function loadUsers() {
-        tbody.innerHTML = '<tr><td colspan="4" class="users__empty">Loading…</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4">' + window.uiSpinner('Loading users') + '</td></tr>';
         fetch('/api/users')
             .then(function (res) { return res.json(); })
             .then(function (users) { paginator.setItems(users); })
             .catch(function () {
-                tbody.innerHTML = '<tr><td colspan="4" class="users__empty">Failed to load users.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4">' + window.uiEmptyState('Failed to load users.', 'error') + '</td></tr>';
                 window.showToast('Failed to load users.', 'error');
             });
     }
 
     function renderUsers(users) {
         if (!users.length) {
-            tbody.innerHTML = '<tr><td colspan="4" class="users__empty">No users found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4">' + window.uiEmptyState('No users found.') + '</td></tr>';
             return;
         }
 

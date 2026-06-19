@@ -15,6 +15,7 @@ namespace Network.Management.App.Repository
         public DbSet<Role> Roles { get; set; }
         public DbSet<DeviceType> DeviceTypes { get; set; }
         public DbSet<DeviceLocation> DeviceLocations { get; set; }
+        public DbSet<NetworkSetting> NetworkSettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -93,6 +94,18 @@ namespace Network.Management.App.Repository
                 entity.Property(dl => dl.LocationName).HasColumnName("location_name").IsRequired();
                 entity.Property(dl => dl.LocationFloor).HasColumnName("location_floor");
             });
+
+            modelBuilder.Entity<NetworkSetting>(entity =>
+            {
+                entity.ToTable("network_setting");
+                entity.HasKey(n => n.Id);
+
+                entity.Property(n => n.Id).HasColumnName("network_setting_id");
+                entity.Property(n => n.RangeStart).HasColumnName("range_start").IsRequired();
+                entity.Property(n => n.RangeEnd).HasColumnName("range_end").IsRequired();
+            });
+
+
 
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)

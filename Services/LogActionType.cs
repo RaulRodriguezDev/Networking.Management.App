@@ -14,8 +14,12 @@ namespace Network.Management.App.Services
         public const string DeviceDeleted = "DEVICE_DELETED";
         public const string DeviceStatusChanged = "DEVICE_STATUS_CHANGED";
 
+        public const string DeviceTypeCreated = "DEVICE_TYPE_CREATED";
+
         public const string LocationCreated = "LOCATION_CREATED";
         public const string LocationUpdated = "LOCATION_UPDATED";
         public const string LocationDeleted = "LOCATION_DELETED";
+
+        public const string NetworkRangeChanged = "NETWORK_RANGE_CHANGED";
     }
 }

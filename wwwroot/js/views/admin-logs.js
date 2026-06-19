@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function loadLogs(category) {
         currentCategory = category || '';
-        tbody.innerHTML = '<tr><td colspan="6" class="logs__empty">Loading…</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6">' + window.uiSpinner('Loading logs') + '</td></tr>';
 
         var url = '/api/logs' + (category ? '?category=' + encodeURIComponent(category) : '');
         fetch(url)
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 applyFilters();
             })
             .catch(function () {
-                tbody.innerHTML = '<tr><td colspan="6" class="logs__empty">Failed to load logs.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6">' + window.uiEmptyState('Failed to load logs.', 'error') + '</td></tr>';
                 window.showToast('Failed to load logs.', 'error');
             });
     }
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function renderLogs(logs) {
         if (!logs.length) {
-            tbody.innerHTML = '<tr><td colspan="6" class="logs__empty">No logs found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6">' + window.uiEmptyState('No logs found.') + '</td></tr>';
             return;
         }
 

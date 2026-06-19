@@ -49,19 +49,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ===== Load data =====
     function loadLocations() {
-        tbody.innerHTML = '<tr><td colspan="5" class="locations__empty">Loading…</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5">' + window.uiSpinner('Loading locations') + '</td></tr>';
         fetch('/api/locations')
             .then(function (res) { return res.json(); })
             .then(function (locations) { paginator.setItems(locations); })
             .catch(function () {
-                tbody.innerHTML = '<tr><td colspan="5" class="locations__empty">Failed to load locations.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5">' + window.uiEmptyState('Failed to load locations.', 'error') + '</td></tr>';
                 window.showToast('Failed to load locations.', 'error');
             });
     }
 
     function renderLocations(locations) {
         if (!locations.length) {
-            tbody.innerHTML = '<tr><td colspan="5" class="locations__empty">No locations found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5">' + window.uiEmptyState('No locations found.') + '</td></tr>';
             return;
         }
 

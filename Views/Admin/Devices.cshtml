@@ -1,0 +1,240 @@
+@{
+    ViewData["Title"] = "Device Management";
+    var isAdmin = User.IsInRole("Admin");
+}
+
+<section class="devices" id="devices-page" data-is-admin="@isAdmin.ToString().ToLower()">
+    <div class="devices__header">
+        <div class="devices__header-info">
+            <a asp-controller="Admin" asp-action="Index" class="devices__back" title="Back to Administration">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5" />
+                    <path d="M12 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div>
+                <h2>Device Management</h2>
+                <p>Register new devices, assign them to a type and location, and manage equipment.</p>
+            </div>
+        </div>
+        <button type="button" class="btn btn--ghost devices__range-btn" id="btn-ip-range">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12.55a11 11 0 0114.08 0" />
+                <path d="M1.42 9a16 16 0 0121.16 0" />
+                <path d="M8.53 16.11a6 6 0 016.95 0" />
+                <line x1="12" y1="20" x2="12.01" y2="20" />
+            </svg>
+            <span>IP Range</span>
+        </button>
+    </div>
+
+    <div class="devices__actions">
+        <button type="button" class="action-card action-card--device" id="btn-add-device">
+            <span class="action-card__icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
+                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
+                    <line x1="6" y1="6" x2="6.01" y2="6" />
+                    <line x1="6" y1="18" x2="6.01" y2="18" />
+                </svg>
+            </span>
+            <span class="action-card__text">
+                <span class="action-card__title">Add Device</span>
+                <span class="action-card__desc">Register a new device and assign it to a type and location.</span>
+            </span>
+        </button>
+
+        <button type="button" class="action-card action-card--type" id="btn-add-device-type">
+            <span class="action-card__icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
+                    <line x1="7" y1="7" x2="7.01" y2="7" />
+                </svg>
+            </span>
+            <span class="action-card__text">
+                <span class="action-card__title">Add Device Type</span>
+                <span class="action-card__desc">Define a new category of device, such as Router or Switch.</span>
+            </span>
+        </button>
+    </div>
+
+    <div class="devices__grid" id="devices-grid">
+        <p class="ui-state__cell">Loading...</p>
+    </div>
+
+    <div class="pagination" id="devices-pagination"></div>
+</section>
+
+<!-- ===== Add Device Modal ===== -->
+<div class="modal" id="device-modal" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="device-modal-title">
+        <div class="modal__header">
+            <h3 id="device-modal-title">Add Device</h3>
+            <button type="button" class="modal__close" data-close-modal aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="device-form" class="modal__body">
+            <input type="hidden" id="device-id" />
+
+            <div class="form-group">
+                <label for="device-name">Device Name</label>
+                <input type="text" id="device-name" maxlength="100" placeholder="e.g. Reception Switch" />
+                <small class="form-hint">Optional friendly name.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="device-ip">IP Address</label>
+                <div class="device-ip-field">
+                    <input type="text" id="device-ip" required maxlength="45" placeholder="e.g. 192.168.1.10" />
+                    <button type="button" class="btn btn--ghost device-ip-suggest" id="btn-suggest-ip" title="Suggest an available IP">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18h6M10 22h4M12 2a7 7 0 00-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0012 2z" />
+                        </svg>
+                        <span>Suggest</span>
+                    </button>
+                </div>
+                <small class="form-hint" id="device-ip-hint">Must be a unique IPv4 within the assignable range.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="device-type">Type</label>
+                <select id="device-type" required>
+                    <option value="">Select a type…</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="device-location">Location</label>
+                <select id="device-location" required>
+                    <option value="">Select a location…</option>
+                </select>
+            </div>
+        </form>
+
+        <div class="modal__footer">
+            <button type="button" class="btn btn--ghost" data-close-modal>Cancel</button>
+            <button type="button" class="btn btn--primary" id="btn-save-device">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Add Device Type Modal ===== -->
+<div class="modal" id="device-type-modal" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="device-type-modal-title">
+        <div class="modal__header">
+            <h3 id="device-type-modal-title">Add Device Type</h3>
+            <button type="button" class="modal__close" data-close-modal aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="device-type-form" class="modal__body">
+            <div class="form-group">
+                <label for="device-type-name">Type Name</label>
+                <input type="text" id="device-type-name" required maxlength="50" placeholder="e.g. Router" />
+                <small class="form-hint">Must be unique.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="device-type-description">Description</label>
+                <input type="text" id="device-type-description" maxlength="200" placeholder="Optional description" />
+            </div>
+        </form>
+
+        <div class="modal__footer">
+            <button type="button" class="btn btn--ghost" data-close-modal>Cancel</button>
+            <button type="button" class="btn btn--primary" id="btn-save-device-type">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Delete Confirmation Modal ===== -->
+<div class="modal" id="delete-modal" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__dialog modal__dialog--sm" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+        <div class="modal__header">
+            <h3 id="delete-modal-title">Delete Device</h3>
+            <button type="button" class="modal__close" data-close-modal aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="modal__body">
+            <p class="delete-warning">
+                Are you sure you want to delete <strong id="delete-device-name"></strong>?
+                This action cannot be undone.
+            </p>
+        </div>
+        <div class="modal__footer">
+            <button type="button" class="btn btn--ghost" data-close-modal>Cancel</button>
+            <button type="button" class="btn btn--danger" id="btn-confirm-delete">Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== IP Range Modal ===== -->
+<div class="modal" id="ip-range-modal" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="ip-range-modal-title">
+        <div class="modal__header">
+            <h3 id="ip-range-modal-title">Network IP Range</h3>
+            <button type="button" class="modal__close" data-close-modal aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="modal__body">
+            <p class="ip-range__intro">
+                Devices are assigned an IP address from the range below. This range defines the
+                pool of addresses available across the hospital network.
+            </p>
+
+            <div class="ip-range__current" id="ip-range-current">
+                <span class="ip-range__current-label">Current range</span>
+                <span class="ip-range__current-value" id="ip-range-display">…</span>
+            </div>
+
+            <div class="ip-range__warning" id="ip-range-warning">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+                <span>
+                    <strong>Caution:</strong> Changing the IP range reconfigures the entire network and
+                    may temporarily disrupt connectivity for all devices. Proceed only if you understand the impact.
+                </span>
+            </div>
+
+            <form id="ip-range-form" class="ip-range__form" hidden>
+                <div class="form-group">
+                    <label for="range-start">Range Start</label>
+                    <input type="text" id="range-start" maxlength="45" placeholder="e.g. 192.168.1.1" />
+                </div>
+                <div class="form-group">
+                    <label for="range-end">Range End</label>
+                    <input type="text" id="range-end" maxlength="45" placeholder="e.g. 192.168.1.254" />
+                </div>
+            </form>
+        </div>
+
+        <div class="modal__footer">
+            <button type="button" class="btn btn--ghost" data-close-modal>Close</button>
+            <button type="button" class="btn btn--ghost devices__range-edit" id="btn-edit-range">Change range</button>
+            <button type="button" class="btn btn--danger" id="btn-save-range" hidden>Apply network change</button>
+        </div>
+    </div>
+</div>
+
+

@@ -29,6 +29,34 @@ window.showToast = function (message, type) {
     }, 4000);
 };
 
+// ===== Reusable loading spinner markup =====
+// Returns an animated SVG spinner with an optional label. Avoids text ellipsis characters
+// that can be corrupted by bundling, and gives a consistent loading look across the app.
+window.uiSpinner = function (label) {
+    return '<div class="ui-state ui-state--loading" role="status" aria-live="polite">'
+        + '<svg class="ui-spinner" width="34" height="34" viewBox="0 0 50 50" aria-hidden="true">'
+        + '<circle class="ui-spinner__track" cx="25" cy="25" r="20" fill="none" stroke-width="5"/>'
+        + '<circle class="ui-spinner__head" cx="25" cy="25" r="20" fill="none" stroke-width="5"/>'
+        + '</svg>'
+        + (label ? '<span class="ui-state__text">' + label + '</span>' : '')
+        + '</div>';
+};
+
+// ===== Reusable empty / not-found state markup =====
+// kind: 'empty' (default) or 'error'.
+window.uiEmptyState = function (message, kind) {
+    var icons = {
+        empty: '<circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M8 11h6"/>',
+        error: '<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'
+    };
+    var icon = icons[kind] || icons.empty;
+    return '<div class="ui-state ui-state--' + (kind === 'error' ? 'error' : 'empty') + '">'
+        + '<svg class="ui-state__icon" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">'
+        + icon + '</svg>'
+        + '<span class="ui-state__text">' + message + '</span>'
+        + '</div>';
+};
+
 document.addEventListener('DOMContentLoaded', function () {
 var sidebar = document.getElementById('location-sidebar');
 var toggleBtn = document.getElementById('btn-toggle-left');

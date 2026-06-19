@@ -39,7 +39,7 @@
             </a>
         }
 
-        <div class="admin__card admin__card--devices">
+        <a asp-controller="Admin" asp-action="Devices" class="admin__card admin__card--link admin__card--devices">
             <span class="admin__card-icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                      stroke="currentColor" stroke-width="2">
@@ -51,7 +51,7 @@
             </span>
             <h3>Network Devices</h3>
             <p>Register new devices, update configurations, and remove decommissioned equipment.</p>
-        </div>
+        </a>
 
         <a asp-controller="Admin" asp-action="Locations" class="admin__card admin__card--link admin__card--locations">
             <span class="admin__card-icon">

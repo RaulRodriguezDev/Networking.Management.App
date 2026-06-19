@@ -23,6 +23,11 @@ namespace Network.Management.App.Controllers
             return View();
         }
 
+        public IActionResult Devices()
+        {
+            return View();
+        }
+
         public IActionResult Logs()
         {
             return View();

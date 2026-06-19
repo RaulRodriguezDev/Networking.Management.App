@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!mainContent) return;
 
         if (devices.length === 0) {
-            mainContent.innerHTML = '<section class="devices"><p class="devices__empty">No devices registered for this location.</p></section>';
+            mainContent.innerHTML = '<section class="devices">' + window.uiEmptyState('No devices registered for this location.') + '</section>';
             return;
         }
 
@@ -67,13 +67,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function loadDevices(location) {
         if (!mainContent) return;
-        mainContent.innerHTML = '<section class="devices"><p class="devices__empty">Loading…</p></section>';
+        mainContent.innerHTML = '<section class="devices">' + window.uiSpinner('Loading devices') + '</section>';
 
         fetch('/api/devices/by-location/' + location.id)
             .then(function (res) { return res.json(); })
             .then(function (devices) { renderDevices(location, devices); })
             .catch(function () {
-                mainContent.innerHTML = '<section class="devices"><p class="devices__empty">Failed to load devices.</p></section>';
+                mainContent.innerHTML = '<section class="devices">' + window.uiEmptyState('Failed to load devices.', 'error') + '</section>';
             });
     }
 
