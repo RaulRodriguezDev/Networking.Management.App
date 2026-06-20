@@ -28,6 +28,13 @@ namespace Network.Management.App.Controllers
             return View();
         }
 
+        public IActionResult Device(int id)
+        {
+            ViewData["DeviceId"] = id;
+            return View();
+        }
+
+
         public IActionResult Logs()
         {
             return View();

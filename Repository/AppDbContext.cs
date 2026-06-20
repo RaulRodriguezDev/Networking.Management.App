@@ -16,6 +16,9 @@ namespace Network.Management.App.Repository
         public DbSet<DeviceType> DeviceTypes { get; set; }
         public DbSet<DeviceLocation> DeviceLocations { get; set; }
         public DbSet<NetworkSetting> NetworkSettings { get; set; }
+        public DbSet<Vlan> Vlans { get; set; }
+        public DbSet<Port> Ports { get; set; }
+        public DbSet<StaticRoute> Routes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -105,6 +108,49 @@ namespace Network.Management.App.Repository
                 entity.Property(n => n.RangeEnd).HasColumnName("range_end").IsRequired();
             });
 
+            modelBuilder.Entity<Vlan>(entity =>
+            {
+                entity.ToTable("vlans");
+                entity.HasIndex(v => v.VlanNumber).IsUnique();
+                entity.HasKey(v => v.VlanId);
+
+                entity.Property(v => v.VlanId).HasColumnName("vlan_id");
+                entity.Property(v => v.VlanNumber).HasColumnName("vlan_number").IsRequired();
+                entity.Property(v => v.Name).HasColumnName("name").IsRequired();
+                entity.Property(v => v.Description).HasColumnName("description");
+            });
+
+            modelBuilder.Entity<Port>(entity =>
+            {
+                entity.ToTable("ports");
+                entity.HasKey(p => p.PortId);
+
+                entity.Property(p => p.PortId).HasColumnName("port_id");
+                entity.Property(p => p.Name).HasColumnName("name").IsRequired();
+                entity.Property(p => p.IsEnabled).HasColumnName("is_enabled").IsRequired();
+                entity.Property(p => p.IsUp).HasColumnName("is_up").IsRequired();
+                entity.Property(p => p.DeviceId).HasColumnName("device_id").IsRequired();
+                entity.Property(p => p.VlanId).HasColumnName("vlan_id");
+            });
+
+            modelBuilder.Entity<StaticRoute>(entity =>
+            {
+                entity.ToTable("routes");
+                entity.HasKey(r => r.RouteId);
+
+                entity.Property(r => r.RouteId).HasColumnName("route_id");
+                entity.Property(r => r.Destination).HasColumnName("destination").IsRequired();
+                entity.Property(r => r.Gateway).HasColumnName("gateway").IsRequired();
+                entity.Property(r => r.Description).HasColumnName("description");
+                entity.Property(r => r.DeviceId).HasColumnName("device_id").IsRequired();
+            });
+
+
+
+
+
+
+
 
 
             modelBuilder.Entity<User>()
@@ -136,6 +182,30 @@ namespace Network.Management.App.Repository
                 .WithMany(dl => dl.Devices)
                 .HasForeignKey(d => d.DeviceLocationId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Device>()
+                .HasOne(d => d.Vlan)
+                .WithMany(v => v.Devices)
+                .HasForeignKey(d => d.VlanId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Port>()
+                .HasOne(p => p.Device)
+                .WithMany(d => d.Ports)
+                .HasForeignKey(p => p.DeviceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Port>()
+                .HasOne(p => p.Vlan)
+                .WithMany()
+                .HasForeignKey(p => p.VlanId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<StaticRoute>()
+                .HasOne(r => r.Device)
+                .WithMany(d => d.Routes)
+                .HasForeignKey(r => r.DeviceId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

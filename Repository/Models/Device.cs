@@ -12,6 +12,12 @@
 
         public int DeviceLocationId { get; set; }
         public DeviceLocation DeviceLocation { get; set; } = null!;
+
+        public int? VlanId { get; set; }
+        public Vlan? Vlan { get; set; }
+
+        public ICollection<Port> Ports { get; set; } = [];
+        public ICollection<StaticRoute> Routes { get; set; } = [];
     }
 }
 

@@ -1,0 +1,61 @@
+@{
+    ViewData["Title"] = "Device";
+    var deviceId = ViewData["DeviceId"];
+    var isAdmin = User.IsInRole("Admin");
+}
+
+<section class="device-detail" id="device-detail-page"
+         data-device-id="@deviceId" data-is-admin="@isAdmin.ToString().ToLower()">
+
+    <div class="device-detail__main">
+        <div class="device-detail__header">
+            <a asp-controller="Admin" asp-action="Devices" class="device-detail__back" title="Back to devices">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5" /><path d="M12 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div class="device-detail__heading" id="device-heading">
+                <h2 id="device-title">Loading...</h2>
+                <p id="device-subtitle"></p>
+            </div>
+            <span class="status-badge status-badge--unknown" id="device-status-badge">...</span>
+        </div>
+
+        <div class="device-detail__body" id="device-detail-body">
+            <div class="ui-state ui-state--loading">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <aside class="device-actions" id="device-actions">
+        <div class="device-actions__header">
+            <h3>Actions</h3>
+            <p>Manage this device's network configuration.</p>
+        </div>
+        <div class="device-actions__list" id="device-actions-list">
+            <!-- action buttons injected by JS based on role -->
+        </div>
+    </aside>
+</section>
+
+<!-- ===== Generic action modal (form injected by JS) ===== -->
+<div class="modal" id="op-modal" aria-hidden="true">
+    <div class="modal__backdrop" data-close-op></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="op-modal-title">
+        <div class="modal__header">
+            <h3 id="op-modal-title">Action</h3>
+            <button type="button" class="modal__close" data-close-op aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="modal__body" id="op-modal-body"></div>
+        <div class="modal__footer" id="op-modal-footer">
+            <button type="button" class="btn btn--ghost" data-close-op>Cancel</button>
+            <button type="button" class="btn btn--primary" id="op-modal-confirm">Confirm</button>
+        </div>
+    </div>
+</div>
+

@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         grid.innerHTML = devices.map(function (d) {
             var statusClass = statusClasses[d.status] || 'unknown';
-            return '<article class="device-tile">'
+            return '<article class="device-tile" data-open="' + d.deviceId + '" role="button" tabindex="0" title="Open device">'
                 + '<div class="device-tile__top">'
                 + '<span class="device-tile__type">' + escapeHtml(d.deviceType) + '</span>'
                 + '<span class="status-badge status-badge--' + statusClass + '">' + escapeHtml(d.status) + '</span>'
@@ -114,13 +114,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }).join('');
 
         grid.querySelectorAll('[data-edit]').forEach(function (btn) {
-            btn.addEventListener('click', function () { openEditModal(parseInt(btn.dataset.edit)); });
+            btn.addEventListener('click', function (e) { e.stopPropagation(); openEditModal(parseInt(btn.dataset.edit)); });
         });
         grid.querySelectorAll('[data-delete]').forEach(function (btn) {
-            btn.addEventListener('click', function () { openDeleteModal(parseInt(btn.dataset.delete), btn.dataset.name); });
+            btn.addEventListener('click', function (e) { e.stopPropagation(); openDeleteModal(parseInt(btn.dataset.delete), btn.dataset.name); });
         });
         grid.querySelectorAll('[data-connect]').forEach(function (btn) {
-            btn.addEventListener('click', function () { connectDevice(parseInt(btn.dataset.connect), btn.dataset.name, btn); });
+            btn.addEventListener('click', function (e) { e.stopPropagation(); connectDevice(parseInt(btn.dataset.connect), btn.dataset.name, btn); });
+        });
+        grid.querySelectorAll('[data-open]').forEach(function (card) {
+            var go = function () { window.location.href = '/Admin/Device/' + card.dataset.open; };
+            card.addEventListener('click', go);
+            card.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
+            });
         });
     }
 

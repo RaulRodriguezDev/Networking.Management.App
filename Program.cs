@@ -21,6 +21,8 @@ builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IDeviceService, DeviceService>();
 builder.Services.AddScoped<IDeviceTypeService, DeviceTypeService>();
 builder.Services.AddScoped<INetworkSettingService, NetworkSettingService>();
+builder.Services.AddScoped<IVlanService, VlanService>();
+builder.Services.AddScoped<IDeviceOperationsService, DeviceOperationsService>();
 builder.Services.AddScoped<ILogService, LogService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

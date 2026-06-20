@@ -8,6 +8,7 @@ namespace Network.Management.App.Services
     public class DeviceService : IDeviceService
     {
         private const string DefaultStatus = DeviceStatus.Offline;
+        private const int DefaultPortCount = 8;
 
         private readonly AppDbContext _context;
         private readonly IAppLogger _logger;
@@ -195,6 +196,23 @@ namespace Network.Management.App.Services
             // IP configuration here (future work). Only mark the device Online once that succeeds.
 
             device.Status = DeviceStatus.Online;
+
+            // Provision a default set of physical ports the first time the device comes online,
+            // so port configuration is available. TODO: replace with the real port inventory read over SSH.
+            if (!await _context.Ports.AnyAsync(p => p.DeviceId == deviceId))
+            {
+                for (var i = 1; i <= DefaultPortCount; i++)
+                {
+                    _context.Ports.Add(new Port
+                    {
+                        DeviceId = deviceId,
+                        Name = $"Port {i}",
+                        IsEnabled = true,
+                        IsUp = i == 1 // uplink port shows a link by default
+                    });
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             await _logger.PersistDeviceAsync(

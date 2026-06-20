@@ -53,6 +53,9 @@ namespace Network.Management.App.Migrations
                         .HasColumnType("text")
                         .HasColumnName("status");
 
+                    b.Property<int?>("VlanId")
+                        .HasColumnType("integer");
+
                     b.HasKey("DeviceId");
 
                     b.HasIndex("DeviceLocationId");
@@ -61,6 +64,8 @@ namespace Network.Management.App.Migrations
 
                     b.HasIndex("IpAddress")
                         .IsUnique();
+
+                    b.HasIndex("VlanId");
 
                     b.ToTable("devices", (string)null);
                 });
@@ -182,6 +187,45 @@ namespace Network.Management.App.Migrations
                     b.ToTable("network_setting", (string)null);
                 });
 
+            modelBuilder.Entity("Network.Management.App.Repository.Models.Port", b =>
+                {
+                    b.Property<int>("PortId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("port_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PortId"));
+
+                    b.Property<int>("DeviceId")
+                        .HasColumnType("integer")
+                        .HasColumnName("device_id");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_enabled");
+
+                    b.Property<bool>("IsUp")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_up");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<int?>("VlanId")
+                        .HasColumnType("integer")
+                        .HasColumnName("vlan_id");
+
+                    b.HasKey("PortId");
+
+                    b.HasIndex("DeviceId");
+
+                    b.HasIndex("VlanId");
+
+                    b.ToTable("ports", (string)null);
+                });
+
             modelBuilder.Entity("Network.Management.App.Repository.Models.Role", b =>
                 {
                     b.Property<int>("RoleId")
@@ -206,6 +250,40 @@ namespace Network.Management.App.Migrations
                         .IsUnique();
 
                     b.ToTable("roles", (string)null);
+                });
+
+            modelBuilder.Entity("Network.Management.App.Repository.Models.StaticRoute", b =>
+                {
+                    b.Property<int>("RouteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("route_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RouteId"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Destination")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("destination");
+
+                    b.Property<int>("DeviceId")
+                        .HasColumnType("integer")
+                        .HasColumnName("device_id");
+
+                    b.Property<string>("Gateway")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("gateway");
+
+                    b.HasKey("RouteId");
+
+                    b.HasIndex("DeviceId");
+
+                    b.ToTable("routes", (string)null);
                 });
 
             modelBuilder.Entity("Network.Management.App.Repository.Models.User", b =>
@@ -246,6 +324,36 @@ namespace Network.Management.App.Migrations
                     b.ToTable("users", (string)null);
                 });
 
+            modelBuilder.Entity("Network.Management.App.Repository.Models.Vlan", b =>
+                {
+                    b.Property<int>("VlanId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("vlan_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("VlanId"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<int>("VlanNumber")
+                        .HasColumnType("integer")
+                        .HasColumnName("vlan_number");
+
+                    b.HasKey("VlanId");
+
+                    b.HasIndex("VlanNumber")
+                        .IsUnique();
+
+                    b.ToTable("vlans", (string)null);
+                });
+
             modelBuilder.Entity("Network.Management.App.Repository.Models.Device", b =>
                 {
                     b.HasOne("Network.Management.App.Repository.Models.DeviceLocation", "DeviceLocation")
@@ -260,9 +368,16 @@ namespace Network.Management.App.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Network.Management.App.Repository.Models.Vlan", "Vlan")
+                        .WithMany("Devices")
+                        .HasForeignKey("VlanId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("DeviceLocation");
 
                     b.Navigation("DeviceType");
+
+                    b.Navigation("Vlan");
                 });
 
             modelBuilder.Entity("Network.Management.App.Repository.Models.Log", b =>
@@ -283,6 +398,35 @@ namespace Network.Management.App.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Network.Management.App.Repository.Models.Port", b =>
+                {
+                    b.HasOne("Network.Management.App.Repository.Models.Device", "Device")
+                        .WithMany("Ports")
+                        .HasForeignKey("DeviceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Network.Management.App.Repository.Models.Vlan", "Vlan")
+                        .WithMany()
+                        .HasForeignKey("VlanId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Device");
+
+                    b.Navigation("Vlan");
+                });
+
+            modelBuilder.Entity("Network.Management.App.Repository.Models.StaticRoute", b =>
+                {
+                    b.HasOne("Network.Management.App.Repository.Models.Device", "Device")
+                        .WithMany("Routes")
+                        .HasForeignKey("DeviceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Device");
+                });
+
             modelBuilder.Entity("Network.Management.App.Repository.Models.User", b =>
                 {
                     b.HasOne("Network.Management.App.Repository.Models.Role", "Role")
@@ -292,6 +436,13 @@ namespace Network.Management.App.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Network.Management.App.Repository.Models.Device", b =>
+                {
+                    b.Navigation("Ports");
+
+                    b.Navigation("Routes");
                 });
 
             modelBuilder.Entity("Network.Management.App.Repository.Models.DeviceLocation", b =>
@@ -312,6 +463,11 @@ namespace Network.Management.App.Migrations
             modelBuilder.Entity("Network.Management.App.Repository.Models.User", b =>
                 {
                     b.Navigation("Logs");
+                });
+
+            modelBuilder.Entity("Network.Management.App.Repository.Models.Vlan", b =>
+                {
+                    b.Navigation("Devices");
                 });
 #pragma warning restore 612, 618
         }

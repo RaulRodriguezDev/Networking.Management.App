@@ -13,8 +13,17 @@ namespace Network.Management.App.Services
         public const string DeviceUpdated = "DEVICE_UPDATED";
         public const string DeviceDeleted = "DEVICE_DELETED";
         public const string DeviceStatusChanged = "DEVICE_STATUS_CHANGED";
+        public const string DeviceProbed = "DEVICE_PROBED";
+        public const string DeviceIpChanged = "DEVICE_IP_CHANGED";
+        public const string DeviceVlanChanged = "DEVICE_VLAN_CHANGED";
+        public const string DevicePortConfigured = "DEVICE_PORT_CONFIGURED";
+        public const string DeviceRouteChanged = "DEVICE_ROUTE_CHANGED";
 
         public const string DeviceTypeCreated = "DEVICE_TYPE_CREATED";
+
+        public const string VlanCreated = "VLAN_CREATED";
+        public const string VlanUpdated = "VLAN_UPDATED";
+        public const string VlanDeleted = "VLAN_DELETED";
 
         public const string LocationCreated = "LOCATION_CREATED";
         public const string LocationUpdated = "LOCATION_UPDATED";
