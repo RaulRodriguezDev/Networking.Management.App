@@ -18,6 +18,10 @@ namespace Network.Management.App.Services
 
         public async Task<User?> ValidateAsync(string username, string password)
         {
+            // The reserved 'system' account is for automated logging only and can never be logged into.
+            if (string.Equals(username, DataSeeder.SystemUsername, StringComparison.OrdinalIgnoreCase))
+                return null;
+
             var user = await _context.Users
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Username == username.ToLowerInvariant());
@@ -31,6 +35,7 @@ namespace Network.Management.App.Services
         public async Task<IEnumerable<UserDto>> GetAllAsync()
         {
             return await _context.Users
+                .Where(u => u.Username != DataSeeder.SystemUsername)
                 .Select(u => new UserDto
                 {
                     UserId = u.UserId,
@@ -89,6 +94,9 @@ namespace Network.Management.App.Services
             var user = await _context.Users.FindAsync(userId);
             if (user is null) return null;
 
+            // The reserved 'system' account cannot be modified.
+            if (user.Username == DataSeeder.SystemUsername) return null;
+
             user.Name = dto.Name;
             user.RoleId = dto.RoleId;
 
@@ -106,6 +114,9 @@ namespace Network.Management.App.Services
         {
             var user = await _context.Users.FindAsync(userId);
             if (user is null) return false;
+
+            // The reserved 'system' account cannot be deleted.
+            if (user.Username == DataSeeder.SystemUsername) return false;
 
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();

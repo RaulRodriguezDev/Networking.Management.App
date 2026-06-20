@@ -10,12 +10,14 @@ namespace Network.Management.App.Services
         private readonly AppDbContext _context;
         private readonly IAppLogger _logger;
         private readonly IDeviceService _deviceService;
+        private readonly IReachabilityService _reachability;
 
-        public DeviceOperationsService(AppDbContext context, IAppLogger logger, IDeviceService deviceService)
+        public DeviceOperationsService(AppDbContext context, IAppLogger logger, IDeviceService deviceService, IReachabilityService reachability)
         {
             _context = context;
             _logger = logger;
             _deviceService = deviceService;
+            _reachability = reachability;
         }
 
         public async Task<ProbeResultDto?> ProbeAsync(int deviceId, int requestingUserId)
@@ -23,26 +25,55 @@ namespace Network.Management.App.Services
             var device = await _context.Devices.FindAsync(deviceId);
             if (device is null) return null;
 
-            // TODO: Perform a real reachability check (ICMP ping / SSH handshake) against the
-            // device's IP here (future work). For now the probe succeeds only for Online devices.
-            var reachable = device.Status == DeviceStatus.Online;
+            // Perform a real reachability check (ICMP ping) against the device's IP.
+            var ping = await _reachability.PingAsync(device.IpAddress);
+
+            // Reflect the live reachability in the stored status so the UI stays accurate.
+            await ApplyReachabilityAsync(device, ping.Reachable, requestingUserId);
 
             var result = new ProbeResultDto
             {
-                Success = reachable,
-                LatencyMs = reachable ? Random.Shared.Next(1, 25) : null,
-                Message = reachable
+                Success = ping.Reachable,
+                LatencyMs = ping.LatencyMs.HasValue ? (int)ping.LatencyMs.Value : null,
+                Message = ping.Reachable
                     ? "The device responded successfully and is reachable on the network."
-                    : "The device did not respond. It still needs to be configured and connected to the network."
+                    : "The device did not respond. It may be disconnected, powered off, or not yet configured."
             };
 
             await _logger.PersistDeviceAsync(
                 LogActionType.DeviceProbed,
-                $"Connection probe for '{DeviceLabel(device)}': {(reachable ? "reachable" : "no response")}.",
+                $"Connection probe for '{DeviceLabel(device)}': {(ping.Reachable ? "reachable" : "no response")}.",
                 requestingUserId,
                 device.DeviceId);
 
             return result;
+        }
+
+        /// <summary>
+        /// Updates a device's stored status from a live reachability result, logging only when
+        /// the status actually changes. Returns true when a change occurred.
+        /// </summary>
+        public async Task<bool> ApplyReachabilityAsync(Device device, bool reachable, int requestingUserId)
+        {
+            var newStatus = reachable ? DeviceStatus.Online : DeviceStatus.Offline;
+            if (device.Status == newStatus)
+                return false;
+
+            var previous = device.Status;
+            device.Status = newStatus;
+            await _context.SaveChangesAsync();
+
+            var detail = $"Device '{DeviceLabel(device)}' changed from {previous} to {newStatus} (detected via connection probe).";
+
+            // Persist to the Activity Logs when attributed to a real account (a user, or the reserved
+            // 'system' account used by the background monitor). Fall back to console-only when no valid
+            // user id is available, to avoid a foreign-key violation on the logs table.
+            if (requestingUserId > 0)
+                await _logger.PersistDeviceAsync(LogActionType.DeviceStatusChanged, detail, requestingUserId, device.DeviceId);
+            else
+                _logger.Info(LogActionType.DeviceStatusChanged, detail);
+
+            return true;
         }
 
         public async Task<DeviceStatusDto?> GetStatusAsync(int deviceId)

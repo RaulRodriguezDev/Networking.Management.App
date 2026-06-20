@@ -6,6 +6,12 @@
     box-sizing: border-box;
 }
 
+/* The hidden attribute must always win, even over components that set display (e.g. .btn). */
+[hidden] {
+    display: none !important;
+}
+
+
 :root {
     --danube-50: #f2f6fc;
     --danube-100: #e1eaf8;

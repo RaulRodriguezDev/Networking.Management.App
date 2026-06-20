@@ -219,6 +219,27 @@
     color: var(--green);
 }
 
+/* ===== System actor badge (automated entries) ===== */
+.actor-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.actor-badge--system {
+    background: var(--purple-bg);
+    color: var(--purple);
+}
+
+.actor-badge--system svg {
+    flex-shrink: 0;
+}
+
 /* ===== User Logs Modal (used from Users page) ===== */
 .user-logs__list {
     display: flex;

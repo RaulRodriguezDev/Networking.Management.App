@@ -76,6 +76,16 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
+    // Quietly refresh the list (no spinner, keeps the current page) so the background
+    // monitor's status changes appear without disrupting the view.
+    function refreshDevicesQuietly() {
+        if (document.hidden) return;
+        fetch('/api/devices')
+            .then(function (res) { return res.ok ? res.json() : null; })
+            .then(function (devices) { if (devices) paginator.setItems(devices, true); })
+            .catch(function () { /* ignore transient errors */ });
+    }
+
     function renderDevices(devices) {
         if (!devices.length) {
             grid.innerHTML = window.uiEmptyState('No devices yet. Use “Add Device” to register one.');
@@ -441,4 +451,5 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ===== Init =====
     loadDevices();
+    setInterval(refreshDevicesQuietly, 30000);
 });

@@ -96,9 +96,14 @@ window.createPaginator = function (options) {
     }
 
     return {
-        setItems: function (newItems) {
+        setItems: function (newItems, keepPage) {
             items = newItems || [];
-            currentPage = 1;
+            if (!keepPage) {
+                currentPage = 1;
+            } else {
+                // Clamp in case the item count shrank below the current page.
+                currentPage = Math.min(currentPage, totalPages());
+            }
             onRender(pageItems());
             renderControls();
         },

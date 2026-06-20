@@ -6,6 +6,10 @@ using Network.Management.App.Services;
 var builder = WebApplication.CreateBuilder(args);
 var cookieExpiry = builder.Configuration.GetValue<int>("Auth:CookieExpiryMinutes");
 
+// When false (e.g. for a quick LAN test over plain HTTP) cookie security and HTTPS
+// redirection are relaxed. Defaults to true so production stays secure unless explicitly opted out.
+var requireHttps = builder.Configuration.GetValue("Auth:RequireHttps", true);
+
 // Add services to the container.
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
@@ -25,17 +29,22 @@ builder.Services.AddScoped<IVlanService, VlanService>();
 builder.Services.AddScoped<IDeviceOperationsService, DeviceOperationsService>();
 builder.Services.AddScoped<ILogService, LogService>();
 
+// Reachability (real ICMP ping) + the background monitor that keeps device status in sync.
+builder.Services.AddSingleton<IReachabilityService, ReachabilityService>();
+builder.Services.AddHostedService<DeviceMonitorService>();
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Account/Unauthorized";
-        options.AccessDeniedPath = "/Account/Unauthorized";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(cookieExpiry);
-        options.SlidingExpiration = true;
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.Strict;
-    });
+.AddCookie(options =>
+{
+    options.LoginPath = "/Account/Unauthorized";
+    options.AccessDeniedPath = "/Account/Unauthorized";
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(cookieExpiry);
+    options.SlidingExpiration = true;
+    options.Cookie.HttpOnly = true;
+    // Over plain HTTP (LAN test) the auth cookie must be sent on http requests, otherwise login silently fails.
+    options.Cookie.SecurePolicy = requireHttps ? CookieSecurePolicy.Always : CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SameSite = requireHttps ? SameSiteMode.Strict : SameSiteMode.Lax;
+});
 
 builder.Services.AddAuthorization(options =>
 {
@@ -51,11 +60,16 @@ builder.Services.AddWebOptimizer(pipeline =>
 
 var app = builder.Build();
 
-// Seed roles and test users in Development only.
-if (app.Environment.IsDevelopment())
+// Always seed essential infrastructure (roles + the reserved 'system' account for automated logging).
+// Seed the test users only in Development, or when explicitly enabled (e.g. a published LAN test).
+var seederLogger = app.Services.GetRequiredService<ILogger<Program>>();
+if (app.Environment.IsDevelopment() || builder.Configuration.GetValue("SeedData", false))
 {
-    var seederLogger = app.Services.GetRequiredService<ILogger<Program>>();
     await DataSeeder.SeedAsync(app.Services, seederLogger);
+}
+else
+{
+    await DataSeeder.SeedEssentialsAsync(app.Services, seederLogger);
 }
 
 // Configure the HTTP request pipeline.
@@ -66,7 +80,11 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+if (requireHttps)
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseWebOptimizer();
 app.UseStaticFiles();
 app.UseRouting();

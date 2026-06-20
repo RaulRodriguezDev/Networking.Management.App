@@ -82,10 +82,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 + '<td><span class="log-badge log-badge--' + log.category + '">' + categoryLabel + '</span></td>'
                 + '<td class="logs__action">' + escapeHtml(log.actionType) + '</td>'
                 + '<td>' + escapeHtml(log.details) + '</td>'
-                + '<td>' + escapeHtml(log.username) + '</td>'
+                + '<td>' + renderActor(log.username) + '</td>'
                 + '<td>' + (log.deviceName ? escapeHtml(log.deviceName) : '<span class="logs__muted">—</span>') + '</td>'
                 + '</tr>';
         }).join('');
+    }
+
+    // Automated entries are attributed to the reserved 'system' account; show them with a distinct badge.
+    function renderActor(username) {
+        if (username === 'system') {
+            return '<span class="actor-badge actor-badge--system" title="Automated by the system">'
+                + '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'
+                + '<circle cx="12" cy="12" r="3"/>'
+                + '<path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/>'
+                + '</svg>System</span>';
+        }
+        return escapeHtml(username);
     }
 
     function formatDate(iso) {

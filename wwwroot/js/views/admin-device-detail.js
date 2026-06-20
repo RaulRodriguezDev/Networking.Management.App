@@ -465,9 +465,27 @@ document.addEventListener('DOMContentLoaded', function () {
     ]).then(function (results) {
         vlans = results[0] || [];
         locations = results[1] || [];
-    }).then(loadDevice).catch(function () {
+    }).then(loadDevice).then(function () {
+        // Keep the status badge in sync with the background monitor while the page is open.
+        setInterval(refreshStatusBadge, 30000);
+    }).catch(function () {
         body.innerHTML = window.uiEmptyState('This device could not be found.', 'error');
         actionsList.innerHTML = '';
         titleEl.textContent = 'Device not found';
     });
+
+    function refreshStatusBadge() {
+        if (document.hidden) return; // skip when the tab is in the background
+        fetch('/api/devices/' + deviceId)
+            .then(function (res) { return res.ok ? res.json() : null; })
+            .then(function (d) {
+                if (!d || d.status === device.status) return;
+                device.status = d.status;
+                var cls = statusClasses[d.status] || 'unknown';
+                statusBadge.className = 'status-badge status-badge--' + cls;
+                statusBadge.textContent = d.status;
+                window.showToast('Device is now ' + d.status + '.', d.status === 'Online' ? 'success' : 'info');
+            })
+            .catch(function () { /* ignore transient errors */ });
+    }
 });

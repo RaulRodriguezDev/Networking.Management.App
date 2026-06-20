@@ -1,14 +1,22 @@
 using Network.Management.App.Models.DTOs;
+using Network.Management.App.Repository.Models;
 
 namespace Network.Management.App.Services
 {
     /// <summary>
-    /// High-level operations performed against an individual device. Network actions are
-    /// currently simulated — the SSH/CLI integration is marked with TODOs for future work.
+    /// High-level operations performed against an individual device. Configuration actions
+    /// (IP, VLAN, ports, routing) are persisted to the database; the SSH/CLI push is marked
+    /// with TODOs for future work. Reachability is a real ICMP ping.
     /// </summary>
     public interface IDeviceOperationsService
     {
         Task<ProbeResultDto?> ProbeAsync(int deviceId, int requestingUserId);
+
+        /// <summary>
+        /// Updates a device's stored status from a live reachability result, logging only when
+        /// the status actually changes. Returns true when a change occurred.
+        /// </summary>
+        Task<bool> ApplyReachabilityAsync(Device device, bool reachable, int requestingUserId);
 
         Task<DeviceStatusDto?> GetStatusAsync(int deviceId);
 
