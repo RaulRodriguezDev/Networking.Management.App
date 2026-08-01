@@ -19,6 +19,7 @@ namespace Network.Management.App.Repository
         public DbSet<Vlan> Vlans { get; set; }
         public DbSet<Port> Ports { get; set; }
         public DbSet<StaticRoute> Routes { get; set; }
+        public DbSet<AccessSetting> AccessSettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -107,6 +108,18 @@ namespace Network.Management.App.Repository
                 entity.Property(n => n.RangeStart).HasColumnName("range_start").IsRequired();
                 entity.Property(n => n.RangeEnd).HasColumnName("range_end").IsRequired();
             });
+
+            modelBuilder.Entity<AccessSetting>(entity =>
+            {
+                entity.ToTable("access_setting");
+                entity.HasKey(a => a.Id);
+
+                entity.Property(a => a.Id).HasColumnName("access_setting_id");
+                entity.Property(a => a.Mode).HasColumnName("mode").IsRequired();
+                entity.Property(a => a.MasterIp).HasColumnName("master_ip");
+            });
+
+
 
             modelBuilder.Entity<Vlan>(entity =>
             {

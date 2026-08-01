@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Network.Management.App.Middleware;
 using Network.Management.App.Repository;
 using Network.Management.App.Services;
 
@@ -28,6 +29,7 @@ builder.Services.AddScoped<INetworkSettingService, NetworkSettingService>();
 builder.Services.AddScoped<IVlanService, VlanService>();
 builder.Services.AddScoped<IDeviceOperationsService, DeviceOperationsService>();
 builder.Services.AddScoped<ILogService, LogService>();
+builder.Services.AddScoped<IAccessControlService, AccessControlService>();
 
 // Reachability (real ICMP ping) + the background monitor that keeps device status in sync.
 builder.Services.AddSingleton<IReachabilityService, ReachabilityService>();
@@ -41,7 +43,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.ExpireTimeSpan = TimeSpan.FromMinutes(cookieExpiry);
     options.SlidingExpiration = true;
     options.Cookie.HttpOnly = true;
-    // Over plain HTTP (LAN test) the auth cookie must be sent on http requests, otherwise login silently fails.
     options.Cookie.SecurePolicy = requireHttps ? CookieSecurePolicy.Always : CookieSecurePolicy.SameAsRequest;
     options.Cookie.SameSite = requireHttps ? SameSiteMode.Strict : SameSiteMode.Lax;
 });
@@ -84,6 +85,10 @@ if (requireHttps)
 {
     app.UseHttpsRedirection();
 }
+
+// Restrict access by client IP (config allowlist + admin-editable DB setting). Runs before
+// static files so unauthorized computers cannot reach any part of the app.
+app.UseIpAccessRestriction();
 
 app.UseWebOptimizer();
 app.UseStaticFiles();

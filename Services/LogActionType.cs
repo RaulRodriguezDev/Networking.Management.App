@@ -30,5 +30,8 @@ namespace Network.Management.App.Services
         public const string LocationDeleted = "LOCATION_DELETED";
 
         public const string NetworkRangeChanged = "NETWORK_RANGE_CHANGED";
+
+        public const string AccessSettingChanged = "ACCESS_SETTING_CHANGED";
+        public const string AccessDenied = "ACCESS_DENIED";
     }
 }

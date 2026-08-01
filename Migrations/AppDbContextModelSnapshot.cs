@@ -22,6 +22,29 @@ namespace Network.Management.App.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Network.Management.App.Repository.Models.AccessSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("access_setting_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("MasterIp")
+                        .HasColumnType("text")
+                        .HasColumnName("master_ip");
+
+                    b.Property<string>("Mode")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("mode");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("access_setting", (string)null);
+                });
+
             modelBuilder.Entity("Network.Management.App.Repository.Models.Device", b =>
                 {
                     b.Property<int>("DeviceId")
