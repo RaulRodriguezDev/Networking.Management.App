@@ -120,9 +120,14 @@ document.addEventListener('DOMContentLoaded', function () {
         var vlanIcon = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v6H4zM4 14h16v6H4z"/></svg>';
 
         var vlanText = '<span class="device-info__muted">Not assigned</span>';
+        var macIcon = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/></svg>';
+        var macText = device.macAddress
+            ? '<code>' + escapeHtml(device.macAddress) + '</code>'
+            : '<span class="device-info__muted">Unknown</span>';
         var html = '<div class="device-info card">'
             + '<h3 class="card__title">Overview</h3>'
             + infoRow('IP Address', '<code>' + escapeHtml(device.ipAddress) + '</code>', ipIcon)
+            + infoRow('MAC Address', macText, macIcon)
             + infoRow('Type', escapeHtml(device.deviceType), typeIcon)
             + infoRow('Location', escapeHtml(device.deviceLocation), locIcon)
             + infoRow('VLAN', '<span id="overview-vlan">' + vlanText + '</span>', vlanIcon)

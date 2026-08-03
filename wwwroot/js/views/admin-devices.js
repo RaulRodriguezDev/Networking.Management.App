@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var deviceTypeModal = document.getElementById('device-type-modal');
     var deleteModal = document.getElementById('delete-modal');
     var ipRangeModal = document.getElementById('ip-range-modal');
+    var discoverModal = document.getElementById('discover-modal');
 
     var deviceModalTitle = document.getElementById('device-modal-title');
     var deleteDeviceLabel = document.getElementById('delete-device-name');
@@ -17,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
         id: document.getElementById('device-id'),
         name: document.getElementById('device-name'),
         ip: document.getElementById('device-ip'),
+        mac: document.getElementById('device-mac'),
         type: document.getElementById('device-type'),
         location: document.getElementById('device-location')
     };
@@ -52,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
             closeModal(deviceTypeModal);
             closeModal(deleteModal);
             closeModal(ipRangeModal);
+            closeModal(discoverModal);
         });
     });
 
@@ -61,6 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
             closeModal(deviceTypeModal);
             closeModal(deleteModal);
             closeModal(ipRangeModal);
+            closeModal(discoverModal);
         }
     });
 
@@ -88,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function renderDevices(devices) {
         if (!devices.length) {
-            grid.innerHTML = window.uiEmptyState('No devices yet. Use “Add Device” to register one.');
+            grid.innerHTML = window.uiEmptyState('No devices yet. Use ï¿½Add Deviceï¿½ to register one.');
             return;
         }
 
@@ -146,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return fetch('/api/devicetypes')
             .then(function (res) { return res.json(); })
             .then(function (types) {
-                deviceForm.type.innerHTML = '<option value="">Select a type…</option>'
+                deviceForm.type.innerHTML = '<option value="">Select a typeï¿½</option>'
                     + types.map(function (t) {
                         return '<option value="' + t.id + '">' + escapeHtml(t.typeName) + '</option>';
                     }).join('');
@@ -157,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return fetch('/api/locations')
             .then(function (res) { return res.json(); })
             .then(function (locations) {
-                deviceForm.location.innerHTML = '<option value="">Select a location…</option>'
+                deviceForm.location.innerHTML = '<option value="">Select a locationï¿½</option>'
                     + locations.map(function (l) {
                         return '<option value="' + l.id + '">' + escapeHtml(l.locationName) + '</option>';
                     }).join('');
@@ -165,18 +169,23 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ===== Add device =====
-    document.getElementById('btn-add-device').addEventListener('click', function () {
+    function openAddDeviceModal(prefillIp, prefillMac) {
         deviceForm.id.value = '';
         deviceForm.name.value = '';
-        deviceForm.ip.value = '';
+        deviceForm.ip.value = prefillIp || '';
+        deviceForm.mac.value = prefillMac || '';
         deviceForm.type.value = '';
         deviceForm.location.value = '';
         deviceModalTitle.textContent = 'Add Device';
         refreshIpHint();
 
-        Promise.all([loadDeviceTypes(), loadLocations()])
+        return Promise.all([loadDeviceTypes(), loadLocations()])
             .then(function () { openModal(deviceModal); })
             .catch(function () { window.showToast('Failed to load form data.', 'error'); });
+    }
+
+    document.getElementById('btn-add-device').addEventListener('click', function () {
+        openAddDeviceModal();
     });
 
     // Show the assignable range (boundaries reserved) in the IP hint.
@@ -221,6 +230,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 deviceForm.id.value = d.deviceId;
                 deviceForm.name.value = d.deviceName || '';
                 deviceForm.ip.value = d.ipAddress;
+                deviceForm.mac.value = d.macAddress || '';
                 deviceForm.type.value = d.deviceTypeId;
                 deviceForm.location.value = d.deviceLocationId;
                 deviceModalTitle.textContent = 'Edit Device';
@@ -238,6 +248,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var payload = {
             deviceName: deviceForm.name.value.trim() || null,
             ipAddress: deviceForm.ip.value.trim(),
+            macAddress: deviceForm.mac.value.trim() || null,
             deviceTypeId: parseInt(deviceForm.type.value),
             deviceLocationId: parseInt(deviceForm.location.value)
         };
@@ -319,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return res.json();
             })
             .then(function () {
-                window.showToast('Device “' + name + '” connected to the network.', 'success');
+                window.showToast('Device ï¿½' + name + 'ï¿½ connected to the network.', 'success');
                 loadDevices();
             })
             .catch(function () {
@@ -397,7 +408,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(function (res) { return res.json(); })
             .then(function (data) {
                 currentRange = data;
-                rangeDisplay.textContent = data.rangeStart + '  –  ' + data.rangeEnd;
+                rangeDisplay.textContent = data.rangeStart + '  ï¿½  ' + data.rangeEnd;
                 rangeForm.start.value = data.rangeStart;
                 rangeForm.end.value = data.rangeEnd;
             })
@@ -439,7 +450,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return res.json();
         }).then(function (data) {
             currentRange = data;
-            rangeDisplay.textContent = data.rangeStart + '  –  ' + data.rangeEnd;
+            rangeDisplay.textContent = data.rangeStart + '  ï¿½  ' + data.rangeEnd;
             setRangeEditing(false);
             window.showToast('Network IP range updated. The network is being reconfigured.', 'success');
         }).catch(function (err) {
@@ -448,6 +459,110 @@ document.addEventListener('DOMContentLoaded', function () {
             btnSaveRange.disabled = false;
         });
     });
+
+    // ===== Discover devices =====
+    var discoverResults = document.getElementById('discover-results');
+    var discoverRange = document.getElementById('discover-range');
+    var btnRunScan = document.getElementById('btn-run-scan');
+
+    document.getElementById('btn-discover').addEventListener('click', function () {
+        discoverResults.innerHTML = '<p class="discover__hint">Press &ldquo;Scan network&rdquo; to begin. Larger ranges may take a moment.</p>';
+        discoverRange.textContent = 'Range: loading...';
+        openModal(discoverModal);
+
+        fetch('/api/networksettings')
+            .then(function (res) { return res.json(); })
+            .then(function (range) { discoverRange.textContent = 'Range: ' + range.rangeStart + ' \u2013 ' + range.rangeEnd; })
+            .catch(function () { discoverRange.textContent = 'Range: unavailable'; });
+    });
+
+    btnRunScan.addEventListener('click', function () {
+        btnRunScan.disabled = true;
+        discoverResults.innerHTML = window.uiSpinner('Scanning the network for live hosts');
+
+        fetch('/api/devices/discover', { method: 'POST' })
+            .then(function (res) {
+                if (res.status === 400) {
+                    return res.json().then(function (body) { throw new Error(body.message || 'The network range is invalid.'); });
+                }
+                if (res.status === 403) throw new Error('You are not allowed to scan the network.');
+                if (!res.ok) throw new Error('Scan failed.');
+                return res.json();
+            })
+            .then(renderDiscovery)
+            .catch(function (err) {
+                discoverResults.innerHTML = window.uiEmptyState(err.message || 'Network scan failed.', 'error');
+                window.showToast(err.message || 'Network scan failed.', 'error');
+            })
+            .finally(function () { btnRunScan.disabled = false; });
+    });
+
+    function renderDiscovery(result) {
+        discoverRange.textContent = 'Range: ' + result.rangeStart + ' \u2013 ' + result.rangeEnd;
+
+        var html = '<p class="discover__summary">Scanned ' + result.scannedCount + ' address(es): '
+            + '<strong>' + result.discovered.length + '</strong> live host(s), '
+            + '<strong>' + result.missing.length + '</strong> registered device(s) not responding.</p>';
+
+        html += '<h4 class="discover__section-title">Live hosts</h4>';
+        if (!result.discovered.length) {
+            html += '<p class="discover__hint">No hosts responded in the configured range.</p>';
+        } else {
+            html += '<table class="discover__table"><thead><tr>'
+                + '<th>IP Address</th><th>MAC Address</th><th>Latency</th><th>Status</th><th></th>'
+                + '</tr></thead><tbody>';
+            html += result.discovered.map(function (h) {
+                var latency = (h.latencyMs === null || h.latencyMs === undefined) ? '\u2013' : h.latencyMs + ' ms';
+                var statusCell = h.isRegistered
+                    ? '<span class="discover__tag discover__tag--known">Registered' + (h.deviceName ? ': ' + escapeHtml(h.deviceName) : '') + '</span>'
+                    : '<span class="discover__tag discover__tag--new">New</span>';
+                var actionCell = h.isRegistered
+                    ? '<a class="btn btn--ghost btn--sm" href="/Admin/Device/' + h.deviceId + '">Open</a>'
+                    : '<button type="button" class="btn btn--primary btn--sm" data-add-ip="' + escapeHtml(h.ipAddress) + '" data-add-mac="' + escapeHtml(h.macAddress || '') + '">Add</button>';
+                return '<tr>'
+                    + '<td>' + escapeHtml(h.ipAddress) + '</td>'
+                    + '<td>' + (h.macAddress ? escapeHtml(h.macAddress) : '<span class="discover__muted">Unknown</span>') + '</td>'
+                    + '<td>' + latency + '</td>'
+                    + '<td>' + statusCell + '</td>'
+                    + '<td class="discover__action-cell">' + actionCell + '</td>'
+                    + '</tr>';
+            }).join('');
+            html += '</tbody></table>';
+        }
+
+        if (result.missing.length) {
+            html += '<h4 class="discover__section-title">Registered but not responding</h4>';
+            html += '<table class="discover__table"><thead><tr>'
+                + '<th>Device</th><th>IP Address</th><th>Status</th><th></th>'
+                + '</tr></thead><tbody>';
+            html += result.missing.map(function (d) {
+                return '<tr>'
+                    + '<td>' + escapeHtml(d.deviceName || 'Unnamed device') + '</td>'
+                    + '<td>' + escapeHtml(d.ipAddress) + '</td>'
+                    + '<td>' + escapeHtml(d.status) + '</td>'
+                    + '<td class="discover__action-cell">'
+                    + '<button type="button" class="btn btn--danger btn--sm" data-remove-id="' + d.deviceId + '" data-name="' + escapeHtml(d.deviceName || d.ipAddress) + '">Remove</button>'
+                    + '</td>'
+                    + '</tr>';
+            }).join('');
+            html += '</tbody></table>';
+        }
+
+        discoverResults.innerHTML = html;
+
+        discoverResults.querySelectorAll('[data-add-ip]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                closeModal(discoverModal);
+                openAddDeviceModal(btn.dataset.addIp, btn.dataset.addMac);
+            });
+        });
+        discoverResults.querySelectorAll('[data-remove-id]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                closeModal(discoverModal);
+                openDeleteModal(parseInt(btn.dataset.removeId), btn.dataset.name);
+            });
+        });
+    }
 
     // ===== Init =====
     loadDevices();

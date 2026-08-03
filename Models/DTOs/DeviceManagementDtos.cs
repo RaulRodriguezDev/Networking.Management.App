@@ -11,6 +11,9 @@ namespace Network.Management.App.Models.DTOs
         [MaxLength(45)]
         public required string IpAddress { get; set; }
 
+        [MaxLength(17)]
+        public string? MacAddress { get; set; }
+
         [Required]
         public int DeviceTypeId { get; set; }
 
@@ -26,6 +29,9 @@ namespace Network.Management.App.Models.DTOs
         [Required]
         [MaxLength(45)]
         public required string IpAddress { get; set; }
+
+        [MaxLength(17)]
+        public string? MacAddress { get; set; }
 
         [Required]
         public int DeviceTypeId { get; set; }

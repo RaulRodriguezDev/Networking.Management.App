@@ -18,6 +18,7 @@ namespace Network.Management.App.Services
         public const string DeviceVlanChanged = "DEVICE_VLAN_CHANGED";
         public const string DevicePortConfigured = "DEVICE_PORT_CONFIGURED";
         public const string DeviceRouteChanged = "DEVICE_ROUTE_CHANGED";
+        public const string DeviceDiscovered = "DEVICE_DISCOVERED";
 
         public const string DeviceTypeCreated = "DEVICE_TYPE_CREATED";
 

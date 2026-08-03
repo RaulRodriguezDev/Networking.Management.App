@@ -29,6 +29,7 @@ namespace Network.Management.App.Services
                     DeviceId = d.DeviceId,
                     DeviceName = d.DeviceName,
                     IpAddress = d.IpAddress,
+                    MacAddress = d.MacAddress,
                     Status = d.Status,
                     DeviceTypeId = d.DeviceTypeId,
                     DeviceType = d.DeviceType.TypeName,
@@ -47,6 +48,7 @@ namespace Network.Management.App.Services
                     DeviceId = d.DeviceId,
                     DeviceName = d.DeviceName,
                     IpAddress = d.IpAddress,
+                    MacAddress = d.MacAddress,
                     Status = d.Status,
                     DeviceTypeId = d.DeviceTypeId,
                     DeviceType = d.DeviceType.TypeName,
@@ -65,6 +67,7 @@ namespace Network.Management.App.Services
                     DeviceId = d.DeviceId,
                     DeviceName = d.DeviceName,
                     IpAddress = d.IpAddress,
+                    MacAddress = d.MacAddress,
                     Status = d.Status,
                     DeviceTypeId = d.DeviceTypeId,
                     DeviceType = d.DeviceType.TypeName,
@@ -94,7 +97,7 @@ namespace Network.Management.App.Services
 
             // The first and last addresses of the range are reserved and cannot be assigned.
             if (ip <= start || ip >= end)
-                return $"IP address must be within the assignable range ({IpAddressHelper.ToIp(start + 1)} – {IpAddressHelper.ToIp(end - 1)}).";
+                return $"IP address must be within the assignable range ({IpAddressHelper.ToIp(start + 1)} ï¿½ {IpAddressHelper.ToIp(end - 1)}).";
 
             return null;
         }
@@ -140,12 +143,21 @@ namespace Network.Management.App.Services
             return await _context.DeviceLocations.AnyAsync(l => l.Id == deviceLocationId);
         }
 
+        // Store MAC addresses in a single canonical form (uppercase, colon-separated) so
+        // values from manual entry and discovery compare cleanly.
+        private static string? NormalizeMac(string? mac)
+        {
+            if (string.IsNullOrWhiteSpace(mac)) return null;
+            return mac.Trim().Replace('-', ':').ToUpperInvariant();
+        }
+
         public async Task<DeviceDto> CreateAsync(CreateDeviceDto dto, int requestingUserId)
         {
             var device = new Device
             {
                 DeviceName = string.IsNullOrWhiteSpace(dto.DeviceName) ? null : dto.DeviceName.Trim(),
                 IpAddress = dto.IpAddress.Trim(),
+                MacAddress = NormalizeMac(dto.MacAddress),
                 Status = DefaultStatus,
                 DeviceTypeId = dto.DeviceTypeId,
                 DeviceLocationId = dto.DeviceLocationId
@@ -173,6 +185,7 @@ namespace Network.Management.App.Services
 
             device.DeviceName = string.IsNullOrWhiteSpace(dto.DeviceName) ? null : dto.DeviceName.Trim();
             device.IpAddress = dto.IpAddress.Trim();
+            device.MacAddress = NormalizeMac(dto.MacAddress);
             device.DeviceTypeId = dto.DeviceTypeId;
             device.DeviceLocationId = dto.DeviceLocationId;
 

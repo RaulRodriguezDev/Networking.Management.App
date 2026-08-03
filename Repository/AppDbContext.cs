@@ -48,6 +48,7 @@ namespace Network.Management.App.Repository
                 entity.Property(d => d.DeviceId).HasColumnName("device_id");
                 entity.Property(d => d.DeviceName).HasColumnName("device_name");
                 entity.Property(d => d.IpAddress).HasColumnName("ip_address").IsRequired();
+                entity.Property(d => d.MacAddress).HasColumnName("mac_address").HasMaxLength(17);
                 entity.Property(d => d.Status).HasColumnName("status").IsRequired();
                 entity.Property(d => d.DeviceTypeId).HasColumnName("devicetype_id").IsRequired();
                 entity.Property(d => d.DeviceLocationId).HasColumnName("location_id").IsRequired();

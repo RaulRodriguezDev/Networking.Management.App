@@ -28,11 +28,13 @@ builder.Services.AddScoped<IDeviceTypeService, DeviceTypeService>();
 builder.Services.AddScoped<INetworkSettingService, NetworkSettingService>();
 builder.Services.AddScoped<IVlanService, VlanService>();
 builder.Services.AddScoped<IDeviceOperationsService, DeviceOperationsService>();
+builder.Services.AddScoped<IDeviceDiscoveryService, DeviceDiscoveryService>();
 builder.Services.AddScoped<ILogService, LogService>();
 builder.Services.AddScoped<IAccessControlService, AccessControlService>();
 
 // Reachability (real ICMP ping) + the background monitor that keeps device status in sync.
 builder.Services.AddSingleton<IReachabilityService, ReachabilityService>();
+builder.Services.AddSingleton<IMacAddressResolver, MacAddressResolver>();
 builder.Services.AddHostedService<DeviceMonitorService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

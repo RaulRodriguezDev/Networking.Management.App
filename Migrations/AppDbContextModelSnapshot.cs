@@ -71,6 +71,11 @@ namespace Network.Management.App.Migrations
                         .HasColumnType("text")
                         .HasColumnName("ip_address");
 
+                    b.Property<string>("MacAddress")
+                        .HasMaxLength(17)
+                        .HasColumnType("character varying(17)")
+                        .HasColumnName("mac_address");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text")
