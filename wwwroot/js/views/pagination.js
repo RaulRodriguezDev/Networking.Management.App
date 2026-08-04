@@ -43,7 +43,7 @@ window.createPaginator = function (options) {
         var from = (currentPage - 1) * pageSize + 1;
         var to = Math.min(currentPage * pageSize, items.length);
 
-        var html = '<div class="pagination__info">Showing ' + from + '–' + to + ' of ' + items.length + '</div>'
+        var html = '<div class="pagination__info">Showing ' + from + ' - ' + to + ' of ' + items.length + '</div>'
             + '<div class="pagination__controls">';
 
         html += '<button type="button" class="pagination__btn" data-page="prev"' + (currentPage === 1 ? ' disabled' : '') + '>'
@@ -52,7 +52,7 @@ window.createPaginator = function (options) {
 
         pageNumbers(total).forEach(function (p) {
             if (p === '...') {
-                html += '<span class="pagination__ellipsis">…</span>';
+                html += '<span class="pagination__ellipsis">...</span>';
             } else {
                 html += '<button type="button" class="pagination__btn pagination__page' + (p === currentPage ? ' pagination__page--active' : '') + '" data-page="' + p + '">' + p + '</button>';
             }

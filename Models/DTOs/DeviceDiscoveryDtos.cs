@@ -10,6 +10,9 @@ namespace Network.Management.App.Models.DTOs
         public string? MacAddress { get; set; }
         public long? LatencyMs { get; set; }
 
+        // Reverse-DNS (PTR) name seen on the network; null when the host has no PTR record.
+        public string? HostName { get; set; }
+
         // True when a device with this IP already exists in the app.
         public bool IsRegistered { get; set; }
         public int? DeviceId { get; set; }

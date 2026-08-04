@@ -14,9 +14,13 @@ document.addEventListener('DOMContentLoaded', function () {
         return div.innerHTML;
     }
 
-    function updateTopbar(location, devices) {
-        if (topbarTitle) topbarTitle.textContent = location.locationName + ' — ' + location.locationFloor;
+    function updateTitle(location) {
+        if (topbarTitle) topbarTitle.textContent = location.locationName + ' - ' + location.locationFloor;
+    }
 
+    // The three topbar badges are a live, network-wide summary (all locations combined),
+    // not the counts for the single location currently being viewed.
+    function renderStats(devices) {
         var online = devices.filter(function (d) { return d.status === 'Online'; }).length;
         var offline = devices.filter(function (d) { return d.status === 'Offline'; }).length;
 
@@ -25,17 +29,38 @@ document.addEventListener('DOMContentLoaded', function () {
         if (offlineCount) offlineCount.textContent = offline + ' offline';
     }
 
+    function loadNetworkStats() {
+        fetch('/api/devices')
+            .then(function (res) { return res.json(); })
+            .then(function (devices) { renderStats(Array.isArray(devices) ? devices : []); })
+            .catch(function () { /* keep the last known counts on a transient failure */ });
+    }
+
+    function deviceHeader(location) {
+        return '<div class="devices__header">'
+            + '<button type="button" class="devices__back" id="btn-back-home" title="Back to home" aria-label="Back to home">'
+            + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>'
+            + '</button>'
+            + '<div class="devices__heading">'
+            + '<h3 class="devices__title">' + escapeHtml(location.locationName) + '</h3>'
+            + '<span class="devices__subtitle">' + escapeHtml(location.locationFloor || '') + '</span>'
+            + '</div>'
+            + '</div>';
+    }
+
     function renderDevices(location, devices) {
-        updateTopbar(location, devices);
+        updateTitle(location);
 
         if (!mainContent) return;
 
         if (devices.length === 0) {
-            mainContent.innerHTML = '<section class="devices">' + window.uiEmptyState('No devices registered for this location.') + '</section>';
+            mainContent.innerHTML = '<section class="devices">' + deviceHeader(location) + window.uiEmptyState('No devices registered for this location.') + '</section>';
+            bindDevicesEvents();
             return;
         }
 
         mainContent.innerHTML = '<section class="devices">'
+            + deviceHeader(location)
             + '<div class="devices__grid">'
             + devices.map(function (d) {
                 var statusClass = d.status === 'Online' ? 'online' : 'offline';
@@ -58,11 +83,24 @@ document.addEventListener('DOMContentLoaded', function () {
             + '</div>'
             + '</section>';
 
+        bindDevicesEvents();
+    }
+
+    function bindDevicesEvents() {
+        var backBtn = document.getElementById('btn-back-home');
+        if (backBtn) backBtn.addEventListener('click', showWelcome);
+
+        if (!mainContent) return;
         mainContent.querySelectorAll('.device-card__logs').forEach(function (btn) {
             btn.addEventListener('click', function () {
                 window.location.href = '/Admin/Logs?device=' + encodeURIComponent(btn.dataset.device);
             });
         });
+    }
+
+    function showWelcome() {
+        // Navigate to the Home route so the welcome screen and sidebar reset cleanly.
+        window.location.href = '/';
     }
 
     function loadDevices(location) {
@@ -80,4 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('locationSelected', function (e) {
         loadDevices(e.detail);
     });
+
+    loadNetworkStats();
+    setInterval(loadNetworkStats, 30000);
 });

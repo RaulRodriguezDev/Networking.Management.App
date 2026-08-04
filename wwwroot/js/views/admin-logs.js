@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 + '<td class="logs__action">' + escapeHtml(log.actionType) + '</td>'
                 + '<td>' + escapeHtml(log.details) + '</td>'
                 + '<td>' + renderActor(log.username) + '</td>'
-                + '<td>' + (log.deviceName ? escapeHtml(log.deviceName) : '<span class="logs__muted">—</span>') + '</td>'
+                + '<td>' + (log.deviceName ? escapeHtml(log.deviceName) : '<span class="logs__muted">N/A</span>') + '</td>'
                 + '</tr>';
         }).join('');
     }

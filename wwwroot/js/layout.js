@@ -99,7 +99,8 @@ var locationList = document.getElementById('location-list');
 
             var itemsHtml = items.map(function (l) {
                 var isActive = l.id === selectedLocationId ? ' active' : '';
-                return '<div class="sidebar__nav-item' + isActive + '" data-id="' + l.id + '">'
+                return '<div class="sidebar__location" data-id="' + l.id + '">'
+                    + '<div class="sidebar__nav-item' + isActive + '" data-id="' + l.id + '">'
                     + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'
                     + '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>'
                     + '<div class="location-info">'
@@ -107,6 +108,8 @@ var locationList = document.getElementById('location-list');
                     + '<div class="location-floor">' + (l.totalDevices || 0) + ' device' + (l.totalDevices === 1 ? '' : 's') + '</div>'
                     + '</div>'
                     + '<span class="status-dot ' + l.status + '"></span>'
+                    + '</div>'
+                    + '<div class="sidebar__accordion"><div class="sidebar__accordion-inner"></div></div>'
                     + '</div>';
             }).join('');
 
@@ -122,6 +125,7 @@ var locationList = document.getElementById('location-list');
 
         bindFloorHeaders();
         bindLocationItems();
+        bindLocationHover();
     }
 
     function bindFloorHeaders() {
@@ -148,6 +152,53 @@ var locationList = document.getElementById('location-list');
                 }
             });
         });
+    }
+
+    // Hovering a location expands an inline accordion that previews its devices.
+    // The device list is fetched lazily on first hover and cached on the element.
+    function bindLocationHover() {
+        locationList.querySelectorAll('.sidebar__location').forEach(function (loc) {
+            loc.addEventListener('mouseenter', function () { openAccordion(loc); });
+            loc.addEventListener('mouseleave', function () { closeAccordion(loc); });
+        });
+    }
+
+    function openAccordion(loc) {
+        var panel = loc.querySelector('.sidebar__accordion');
+        var inner = loc.querySelector('.sidebar__accordion-inner');
+        if (!panel || !inner) return;
+
+        panel.classList.add('expanded');
+        if (loc.dataset.loaded === '1') return;
+        loc.dataset.loaded = '1';
+
+        inner.innerHTML = '<div class="sidebar__accordion-empty">Loading</div>';
+        fetch('/api/devices/by-location/' + parseInt(loc.dataset.id))
+            .then(function (res) { return res.json(); })
+            .then(function (devices) { inner.innerHTML = renderAccordionDevices(devices); })
+            .catch(function () {
+                inner.innerHTML = '<div class="sidebar__accordion-empty">Failed to load</div>';
+                loc.dataset.loaded = '';
+            });
+    }
+
+    function closeAccordion(loc) {
+        var panel = loc.querySelector('.sidebar__accordion');
+        if (panel) panel.classList.remove('expanded');
+    }
+
+    function renderAccordionDevices(devices) {
+        if (!devices || devices.length === 0) {
+            return '<div class="sidebar__accordion-empty">No devices</div>';
+        }
+        return devices.map(function (d) {
+            var st = d.status === 'Online' ? 'online' : (d.status === 'Offline' ? 'offline' : 'warning');
+            return '<div class="sidebar__accordion-item">'
+                + '<span class="status-dot ' + st + '"></span>'
+                + '<span class="sidebar__accordion-name">' + escapeHtml(d.deviceName || d.ipAddress) + '</span>'
+                + '<span class="sidebar__accordion-ip">' + escapeHtml(d.ipAddress) + '</span>'
+                + '</div>';
+        }).join('');
     }
 
     function escapeHtml(str) {

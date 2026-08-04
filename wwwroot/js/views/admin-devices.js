@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return fetch('/api/locations')
             .then(function (res) { return res.json(); })
             .then(function (locations) {
-                deviceForm.location.innerHTML = '<option value="">Select a location�</option>'
+                deviceForm.location.innerHTML = '<option value="">Select a location</option>'
                     + locations.map(function (l) {
                         return '<option value="' + l.id + '">' + escapeHtml(l.locationName) + '</option>';
                     }).join('');
@@ -170,9 +170,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ===== Add device =====
-    function openAddDeviceModal(prefillIp, prefillMac) {
+    function openAddDeviceModal(prefillIp, prefillMac, prefillName) {
         deviceForm.id.value = '';
-        deviceForm.name.value = '';
+        deviceForm.name.value = prefillName || '';
         deviceForm.ip.value = prefillIp || '';
         deviceForm.mac.value = prefillMac || '';
         // A device found on the network almost certainly leases its IP from the router, so
@@ -414,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(function (res) { return res.json(); })
             .then(function (data) {
                 currentRange = data;
-                rangeDisplay.textContent = data.rangeStart + '  �  ' + data.rangeEnd;
+                rangeDisplay.textContent = data.rangeStart + '  -  ' + data.rangeEnd;
                 rangeForm.start.value = data.rangeStart;
                 rangeForm.end.value = data.rangeEnd;
             })
@@ -515,18 +515,21 @@ document.addEventListener('DOMContentLoaded', function () {
             html += '<p class="discover__hint">No hosts responded in the configured range.</p>';
         } else {
             html += '<table class="discover__table"><thead><tr>'
-                + '<th>IP Address</th><th>MAC Address</th><th>Latency</th><th>Status</th><th></th>'
+                + '<th>IP Address</th><th>Name</th><th>MAC Address</th><th>Latency</th><th>Status</th><th></th>'
                 + '</tr></thead><tbody>';
             html += result.discovered.map(function (h) {
                 var latency = (h.latencyMs === null || h.latencyMs === undefined) ? '\u2013' : h.latencyMs + ' ms';
+                var name = h.isRegistered ? (h.deviceName || '') : (h.hostName || '');
+                var nameCell = name ? escapeHtml(name) : '<span class="discover__muted">Unknown</span>';
                 var statusCell = h.isRegistered
                     ? '<span class="discover__tag discover__tag--known">Registered' + (h.deviceName ? ': ' + escapeHtml(h.deviceName) : '') + '</span>'
                     : '<span class="discover__tag discover__tag--new">New</span>';
                 var actionCell = h.isRegistered
                     ? '<a class="btn btn--ghost btn--sm" href="/Admin/Device/' + h.deviceId + '">Open</a>'
-                    : '<button type="button" class="btn btn--primary btn--sm" data-add-ip="' + escapeHtml(h.ipAddress) + '" data-add-mac="' + escapeHtml(h.macAddress || '') + '">Add</button>';
+                    : '<button type="button" class="btn btn--primary btn--sm" data-add-ip="' + escapeHtml(h.ipAddress) + '" data-add-mac="' + escapeHtml(h.macAddress || '') + '" data-add-name="' + escapeHtml(h.hostName || '') + '">Add</button>';
                 return '<tr>'
                     + '<td>' + escapeHtml(h.ipAddress) + '</td>'
+                    + '<td>' + nameCell + '</td>'
                     + '<td>' + (h.macAddress ? escapeHtml(h.macAddress) : '<span class="discover__muted">Unknown</span>') + '</td>'
                     + '<td>' + latency + '</td>'
                     + '<td>' + statusCell + '</td>'
@@ -559,7 +562,7 @@ document.addEventListener('DOMContentLoaded', function () {
         discoverResults.querySelectorAll('[data-add-ip]').forEach(function (btn) {
             btn.addEventListener('click', function () {
                 closeModal(discoverModal);
-                openAddDeviceModal(btn.dataset.addIp, btn.dataset.addMac);
+                openAddDeviceModal(btn.dataset.addIp, btn.dataset.addMac, btn.dataset.addName);
             });
         });
         discoverResults.querySelectorAll('[data-remove-id]').forEach(function (btn) {

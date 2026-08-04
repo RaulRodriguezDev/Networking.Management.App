@@ -11,6 +11,7 @@ namespace Network.Management.App.Services
         private const int MaxConcurrentProbes = 64;
         private const int ProbeTimeoutMs = 1000;
         private const int MaxScanSize = 65536;
+        private const int HostNameTimeoutMs = 1000;
 
         private readonly AppDbContext _context;
         private readonly IAppLogger _logger;
@@ -129,17 +130,45 @@ namespace Network.Management.App.Services
                 var result = await _reachability.PingAsync(ipAddress, ProbeTimeoutMs);
                 if (!result.Reachable) return null;
 
+                var macTask = _macResolver.ResolveAsync(ipAddress);
+                var hostTask = ResolveHostNameAsync(ipAddress);
+                await Task.WhenAll(macTask, hostTask);
+
                 return new DiscoveredDeviceDto
                 {
                     IpAddress = ipAddress,
                     LatencyMs = result.LatencyMs,
-                    MacAddress = await _macResolver.ResolveAsync(ipAddress)
+                    MacAddress = await macTask,
+                    HostName = await hostTask
                 };
             }
             finally
             {
                 throttler.Release();
             }
+        }
+
+        // Best-effort reverse-DNS lookup. Returns null on timeout, no PTR record, or when the
+        // resolver just echoes the IP back (i.e. no real name is available).
+        private static async Task<string?> ResolveHostNameAsync(string ipAddress)
+        {
+            if (!System.Net.IPAddress.TryParse(ipAddress, out var ip)) return null;
+
+            try
+            {
+                var lookup = System.Net.Dns.GetHostEntryAsync(ip);
+                var completed = await Task.WhenAny(lookup, Task.Delay(HostNameTimeoutMs));
+                if (completed != lookup) return null;
+
+                var host = (await lookup).HostName;
+                if (string.IsNullOrWhiteSpace(host)
+                    || string.Equals(host, ipAddress, StringComparison.OrdinalIgnoreCase))
+                    return null;
+
+                return host;
+            }
+            catch (System.Net.Sockets.SocketException) { return null; }
+            catch (ArgumentException) { return null; }
         }
     }
 }
