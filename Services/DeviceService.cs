@@ -30,6 +30,7 @@ namespace Network.Management.App.Services
                     DeviceName = d.DeviceName,
                     IpAddress = d.IpAddress,
                     MacAddress = d.MacAddress,
+                    AddressingMode = d.AddressingMode,
                     Status = d.Status,
                     DeviceTypeId = d.DeviceTypeId,
                     DeviceType = d.DeviceType.TypeName,
@@ -49,6 +50,7 @@ namespace Network.Management.App.Services
                     DeviceName = d.DeviceName,
                     IpAddress = d.IpAddress,
                     MacAddress = d.MacAddress,
+                    AddressingMode = d.AddressingMode,
                     Status = d.Status,
                     DeviceTypeId = d.DeviceTypeId,
                     DeviceType = d.DeviceType.TypeName,
@@ -68,6 +70,7 @@ namespace Network.Management.App.Services
                     DeviceName = d.DeviceName,
                     IpAddress = d.IpAddress,
                     MacAddress = d.MacAddress,
+                    AddressingMode = d.AddressingMode,
                     Status = d.Status,
                     DeviceTypeId = d.DeviceTypeId,
                     DeviceType = d.DeviceType.TypeName,
@@ -158,6 +161,7 @@ namespace Network.Management.App.Services
                 DeviceName = string.IsNullOrWhiteSpace(dto.DeviceName) ? null : dto.DeviceName.Trim(),
                 IpAddress = dto.IpAddress.Trim(),
                 MacAddress = NormalizeMac(dto.MacAddress),
+                AddressingMode = Services.AddressingMode.Normalize(dto.AddressingMode),
                 Status = DefaultStatus,
                 DeviceTypeId = dto.DeviceTypeId,
                 DeviceLocationId = dto.DeviceLocationId
@@ -186,6 +190,7 @@ namespace Network.Management.App.Services
             device.DeviceName = string.IsNullOrWhiteSpace(dto.DeviceName) ? null : dto.DeviceName.Trim();
             device.IpAddress = dto.IpAddress.Trim();
             device.MacAddress = NormalizeMac(dto.MacAddress);
+            device.AddressingMode = Services.AddressingMode.Normalize(dto.AddressingMode);
             device.DeviceTypeId = dto.DeviceTypeId;
             device.DeviceLocationId = dto.DeviceLocationId;
 

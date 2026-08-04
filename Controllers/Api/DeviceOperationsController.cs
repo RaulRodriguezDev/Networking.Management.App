@@ -36,8 +36,15 @@ namespace Network.Management.App.Controllers.Api
         [HttpPut("ip")]
         public async Task<IActionResult> ChangeIp(int deviceId, [FromBody] ChangeDeviceIpDto dto)
         {
-            var updated = await _operations.ChangeIpAsync(deviceId, dto.IpAddress, RequestingUserId());
-            return updated is null ? NotFound() : Ok(updated);
+            try
+            {
+                var updated = await _operations.ChangeIpAsync(deviceId, dto.IpAddress, RequestingUserId());
+                return updated is null ? NotFound() : Ok(updated);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpPut("vlan")]

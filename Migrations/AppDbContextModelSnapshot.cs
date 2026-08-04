@@ -54,6 +54,14 @@ namespace Network.Management.App.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DeviceId"));
 
+                    b.Property<string>("AddressingMode")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("Static")
+                        .HasColumnName("addressing_mode");
+
                     b.Property<int>("DeviceLocationId")
                         .HasColumnType("integer")
                         .HasColumnName("location_id");

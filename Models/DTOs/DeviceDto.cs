@@ -6,6 +6,7 @@ namespace Network.Management.App.Models.DTOs
         public string? DeviceName { get; set; }
         public required string IpAddress { get; set; }
         public string? MacAddress { get; set; }
+        public required string AddressingMode { get; set; }
         public required string Status { get; set; }
         public int DeviceTypeId { get; set; }
         public required string DeviceType { get; set; }

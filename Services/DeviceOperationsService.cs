@@ -99,15 +99,46 @@ namespace Network.Management.App.Services
             var device = await _context.Devices.FindAsync(deviceId);
             if (device is null) return null;
 
-            var previous = device.IpAddress;
-            device.IpAddress = ipAddress.Trim();
-            await _context.SaveChangesAsync();
+            var newIp = ipAddress.Trim();
 
-            // TODO: Apply the new IP address on the device over SSH (future work).
+            // Reject addresses outside the assignable range or already taken by another device.
+            var rangeError = await _deviceService.ValidateIpInRangeAsync(newIp);
+            if (rangeError is not null)
+                throw new InvalidOperationException(rangeError);
+
+            if (await _deviceService.IpAddressExistsAsync(newIp, device.DeviceId))
+                throw new InvalidOperationException($"IP address {newIp} is already assigned to another device.");
+
+            if (string.Equals(device.IpAddress, newIp, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("The device already uses this IP address.");
+
+            var previous = device.IpAddress;
+            string appliedVia;
+
+            if (device.AddressingMode == AddressingMode.Dhcp)
+            {
+                // DHCP devices keep requesting an address from the router; the only way to pin a
+                // specific IP is a reservation keyed on the MAC address, so it is mandatory here.
+                if (string.IsNullOrWhiteSpace(device.MacAddress))
+                    throw new InvalidOperationException(
+                        "A DHCP device needs a known MAC address to reserve an IP. Add the MAC address to this device first, then change the IP.");
+
+                // TODO: Create or update the DHCP reservation (MAC -> new IP) on the router, then
+                // force the device to renew its lease so it picks up the reserved address (future work).
+                appliedVia = "DHCP reservation";
+            }
+            else
+            {
+                // TODO: Apply the new static IP directly on the device over SSH (future work).
+                appliedVia = "static assignment";
+            }
+
+            device.IpAddress = newIp;
+            await _context.SaveChangesAsync();
 
             await _logger.PersistDeviceAsync(
                 LogActionType.DeviceIpChanged,
-                $"IP address for '{DeviceLabel(device)}' changed from {previous} to {device.IpAddress}.",
+                $"IP address for '{DeviceLabel(device)}' changed from {previous} to {device.IpAddress} via {appliedVia}.",
                 requestingUserId,
                 device.DeviceId);
 

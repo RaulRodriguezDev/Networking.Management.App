@@ -124,10 +124,15 @@ document.addEventListener('DOMContentLoaded', function () {
         var macText = device.macAddress
             ? '<code>' + escapeHtml(device.macAddress) + '</code>'
             : '<span class="device-info__muted">Unknown</span>';
+        var assignIcon = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg>';
+        var assignText = device.addressingMode === 'Dhcp'
+            ? 'DHCP <span class="device-info__muted">(assigned by the router)</span>'
+            : 'Static <span class="device-info__muted">(set on the device)</span>';
         var html = '<div class="device-info card">'
             + '<h3 class="card__title">Overview</h3>'
             + infoRow('IP Address', '<code>' + escapeHtml(device.ipAddress) + '</code>', ipIcon)
             + infoRow('MAC Address', macText, macIcon)
+            + infoRow('IP Assignment', assignText, assignIcon)
             + infoRow('Type', escapeHtml(device.deviceType), typeIcon)
             + infoRow('Location', escapeHtml(device.deviceLocation), locIcon)
             + infoRow('VLAN', '<span id="overview-vlan">' + vlanText + '</span>', vlanIcon)
@@ -262,11 +267,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ===== Change IP =====
     function openIpModal() {
+        var isDhcp = device.addressingMode === 'Dhcp';
+        var context = isDhcp
+            ? '<p class="op-text">This device uses <strong>DHCP</strong>. The new address is pinned as a reservation on the router, keyed to its MAC address, so it always receives the same IP.</p>'
+            : '<p class="op-text">This device uses a <strong>static</strong> address configured on the device itself.</p>';
+
+        var missingMac = isDhcp && !device.macAddress;
+        var macWarning = missingMac
+            ? '<p class="op-text op-text--warn">No MAC address is recorded for this device. A DHCP reservation needs the MAC address &mdash; add it via <strong>Edit device</strong> or a network scan first.</p>'
+            : '';
+
         openOp('Change IP address',
-            '<div class="form-group"><label for="op-ip">New IP address</label>'
-            + '<input type="text" id="op-ip" maxlength="45" value="' + escapeHtml(device.ipAddress) + '" />'
+            context + macWarning
+            + '<div class="form-group"><label for="op-ip">New IP address</label>'
+            + '<input type="text" id="op-ip" maxlength="45" value="' + escapeHtml(device.ipAddress) + '"' + (missingMac ? ' disabled' : '') + ' />'
             + '<small class="form-hint">Must be a valid IPv4 address (0.0.0.0) within the assignable range.</small></div>',
-            'Apply', function () {
+            missingMac ? null : 'Apply', missingMac ? null : function () {
                 var ip = document.getElementById('op-ip').value.trim();
                 if (!isValidIpv4(ip)) { window.showToast('Enter a valid IPv4 address (0.0.0.0), no subnet mask.', 'error'); return; }
                 api('PUT', '/api/devices/' + deviceId + '/ip', { ipAddress: ip })

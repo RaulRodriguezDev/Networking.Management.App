@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
         name: document.getElementById('device-name'),
         ip: document.getElementById('device-ip'),
         mac: document.getElementById('device-mac'),
+        addressing: document.getElementById('device-addressing'),
         type: document.getElementById('device-type'),
         location: document.getElementById('device-location')
     };
@@ -174,6 +175,9 @@ document.addEventListener('DOMContentLoaded', function () {
         deviceForm.name.value = '';
         deviceForm.ip.value = prefillIp || '';
         deviceForm.mac.value = prefillMac || '';
+        // A device found on the network almost certainly leases its IP from the router, so
+        // default those to DHCP; manually registered devices default to Static.
+        deviceForm.addressing.value = prefillIp ? 'Dhcp' : 'Static';
         deviceForm.type.value = '';
         deviceForm.location.value = '';
         deviceModalTitle.textContent = 'Add Device';
@@ -231,6 +235,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 deviceForm.name.value = d.deviceName || '';
                 deviceForm.ip.value = d.ipAddress;
                 deviceForm.mac.value = d.macAddress || '';
+                deviceForm.addressing.value = d.addressingMode || 'Static';
                 deviceForm.type.value = d.deviceTypeId;
                 deviceForm.location.value = d.deviceLocationId;
                 deviceModalTitle.textContent = 'Edit Device';
@@ -249,6 +254,7 @@ document.addEventListener('DOMContentLoaded', function () {
             deviceName: deviceForm.name.value.trim() || null,
             ipAddress: deviceForm.ip.value.trim(),
             macAddress: deviceForm.mac.value.trim() || null,
+            addressingMode: deviceForm.addressing.value,
             deviceTypeId: parseInt(deviceForm.type.value),
             deviceLocationId: parseInt(deviceForm.location.value)
         };

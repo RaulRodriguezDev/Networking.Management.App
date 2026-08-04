@@ -247,6 +247,13 @@
     margin-bottom: 14px;
 }
 
+.op-text--warn {
+    color: var(--yellow);
+    background: var(--yellow-bg);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+}
+
 .op-hint {
     margin-top: 12px;
     font-size: 0.8rem;

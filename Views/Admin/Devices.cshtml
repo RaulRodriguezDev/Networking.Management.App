@@ -122,6 +122,15 @@
             </div>
 
             <div class="form-group">
+                <label for="device-addressing">IP Assignment</label>
+                <select id="device-addressing">
+                    <option value="Static">Static (set on the device)</option>
+                    <option value="Dhcp">DHCP (assigned by the router)</option>
+                </select>
+                <small class="form-hint">Choose DHCP for devices that get their IP from the router. Pinning a DHCP IP later needs the MAC address.</small>
+            </div>
+
+            <div class="form-group">
                 <label for="device-type">Type</label>
                 <select id="device-type" required>
                     <option value="">Select a type�</option>
