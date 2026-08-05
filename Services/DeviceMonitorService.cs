@@ -11,21 +11,30 @@ namespace Network.Management.App.Services
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IReachabilityService _reachability;
+        private readonly IUnknownDeviceTracker _unknownTracker;
         private readonly ILogger<DeviceMonitorService> _logger;
         private readonly TimeSpan _interval;
+        private readonly TimeSpan _discoveryInterval;
+        private DateTime _lastDiscoveryUtc = DateTime.MinValue;
 
         public DeviceMonitorService(
             IServiceScopeFactory scopeFactory,
             IReachabilityService reachability,
+            IUnknownDeviceTracker unknownTracker,
             IConfiguration configuration,
             ILogger<DeviceMonitorService> logger)
         {
             _scopeFactory = scopeFactory;
             _reachability = reachability;
+            _unknownTracker = unknownTracker;
             _logger = logger;
 
             var minutes = configuration.GetValue("Monitoring:IntervalMinutes", 2);
             _interval = TimeSpan.FromMinutes(minutes <= 0 ? 2 : minutes);
+
+            // Network-wide scans for unknown devices are heavier, so run them less often.
+            var discoveryMinutes = configuration.GetValue("Monitoring:DiscoveryIntervalMinutes", 5);
+            _discoveryInterval = TimeSpan.FromMinutes(discoveryMinutes <= 0 ? 5 : discoveryMinutes);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -46,6 +55,19 @@ namespace Network.Management.App.Services
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "[DeviceMonitor] Polling sweep failed.");
+                }
+
+                if (DateTime.UtcNow - _lastDiscoveryUtc >= _discoveryInterval)
+                {
+                    _lastDiscoveryUtc = DateTime.UtcNow;
+                    try
+                    {
+                        await DetectUnknownAsync(stoppingToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "[DeviceMonitor] Unknown-device scan failed.");
+                    }
                 }
 
                 try
@@ -88,6 +110,36 @@ namespace Network.Management.App.Services
 
             if (changes > 0)
                 _logger.LogInformation("[DeviceMonitor] Swept {Count} device(s); {Changes} status change(s).", devices.Count, changes);
+        }
+
+        // Scans the network for live hosts that are not registered and updates the shared tracker.
+        // Newly appearing hosts are written to the activity log so admins have an audit trail.
+        private async Task DetectUnknownAsync(CancellationToken stoppingToken)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var discovery = scope.ServiceProvider.GetRequiredService<IDeviceDiscoveryService>();
+
+            var unknown = await discovery.DetectUnknownAsync(stoppingToken);
+            var newly = _unknownTracker.Update(unknown);
+            if (newly.Count == 0) return;
+
+            var summary = string.Join(", ", newly.Select(d =>
+                d.HostName is null ? d.IpAddress : $"{d.IpAddress} ({d.HostName})"));
+            _logger.LogInformation("[DeviceMonitor] {Count} new unregistered device(s) detected: {Summary}", newly.Count, summary);
+
+            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var systemUserId = await context.Users
+                .Where(u => u.Username == DataSeeder.SystemUsername)
+                .Select(u => u.UserId)
+                .FirstOrDefaultAsync(stoppingToken);
+
+            if (systemUserId <= 0) return;
+
+            var appLogger = scope.ServiceProvider.GetRequiredService<IAppLogger>();
+            await appLogger.PersistAsync(
+                LogActionType.UnknownDeviceDetected,
+                $"{newly.Count} unregistered device(s) detected on the network: {summary}.",
+                systemUserId);
         }
     }
 }

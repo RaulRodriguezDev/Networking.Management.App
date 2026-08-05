@@ -10,5 +10,11 @@ namespace Network.Management.App.Services
     public interface IDeviceDiscoveryService
     {
         Task<DiscoveryResultDto> DiscoverAsync(int requestingUserId);
+
+        /// <summary>
+        /// Scans the configured range and returns only live hosts that are not registered.
+        /// Performs no logging or persistence; intended for the background monitor.
+        /// </summary>
+        Task<IReadOnlyList<DiscoveredDeviceDto>> DetectUnknownAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -444,6 +444,291 @@ body {
 .topbar__right {
     display: flex;
     gap: 8px;
+    align-items: center;
+}
+
+/* ===== Topbar notification bell ===== */
+.topbar__notify {
+    position: relative;
+    display: flex;
+}
+
+.topbar__notify-btn {
+    position: relative;
+}
+
+.topbar__notify-btn.has-alerts {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+.topbar__notify-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 20px;
+    background: var(--red);
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+}
+
+.topbar__notify-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 380px;
+    max-height: 520px;
+    display: none;
+    flex-direction: column;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    z-index: 60;
+    overflow: hidden;
+}
+
+.topbar__notify-panel.is-open {
+    display: flex;
+}
+
+.topbar__notify-backdrop {
+    display: none;
+}
+
+.topbar__notify-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 14px 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border);
+}
+
+.topbar__notify-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.topbar__notify-close {
+    display: none;
+    width: 26px;
+    height: 26px;
+    line-height: 1;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+
+.topbar__notify-close:hover {
+    background: var(--border);
+    color: var(--text-primary);
+}
+
+.topbar__notify-clear {
+    padding: 3px 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+
+.topbar__notify-clear:hover {
+    background: var(--bg-card-hover);
+}
+
+.topbar__notify-subheader {
+    padding: 8px 14px 4px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+}
+
+.topbar__notify-section + .topbar__notify-section {
+    border-top: 1px solid var(--border);
+}
+
+.topbar__notify-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.topbar__notify-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+.topbar__notify-dot.is-online {
+    background: var(--success, #22c55e);
+}
+
+.topbar__notify-dot.is-offline {
+    background: var(--danger, #ef4444);
+}
+
+.topbar__notify-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px;
+}
+
+.topbar__notify-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+}
+
+.topbar__notify-item:hover {
+    background: var(--bg-card-hover);
+}
+
+.topbar__notify-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.topbar__notify-dismiss {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    line-height: 1;
+    font-size: 1rem;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+
+.topbar__notify-dismiss:hover {
+    background: var(--border);
+    color: var(--text-primary);
+}
+
+.topbar__notify-ip {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.topbar__notify-name {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.topbar__notify-mac {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.topbar__notify-empty {
+    padding: 16px 12px;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.topbar__notify-footer {
+    display: block;
+    padding: 10px 14px;
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--accent);
+    border-top: 1px solid var(--border);
+    text-decoration: none;
+}
+
+.topbar__notify-footer:hover {
+    background: var(--bg-card-hover);
+}
+
+/* On desktop (wider than tablet) the panel becomes a slide-in side drawer that can
+   auto-open when new notifications arrive. */
+@media (min-width: 1024px) {
+    .topbar__notify-panel {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: auto;
+        width: 400px;
+        max-height: none;
+        height: 100vh;
+        display: flex;
+        border: none;
+        border-left: 1px solid var(--border);
+        border-radius: 0;
+        box-shadow: -12px 0 32px rgba(0, 0, 0, 0.4);
+        transform: translateX(100%);
+        transition: transform 0.28s ease;
+    }
+
+    .topbar__notify-panel.is-open {
+        transform: translateX(0);
+    }
+
+    .topbar__notify-backdrop.is-open {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 59;
+    }
+
+    .topbar__notify-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .topbar__notify-list {
+        padding: 8px;
+    }
+
+    .topbar__notify-item {
+        padding: 12px 12px;
+    }
+
+    .topbar__notify-name {
+        font-size: 0.85rem;
+    }
+
+    .topbar__notify-mac {
+        font-size: 0.78rem;
+    }
+
+    .topbar__notify-subheader {
+        font-size: 0.72rem;
+    }
 }
 
 .badge {

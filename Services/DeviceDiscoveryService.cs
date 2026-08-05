@@ -54,19 +54,7 @@ namespace Network.Management.App.Services
                 .GroupBy(d => d.IpAddress, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
 
-            using var throttler = new SemaphoreSlim(MaxConcurrentProbes);
-            var tasks = new List<Task<DiscoveredDeviceDto?>>();
-
-            for (var value = start; value <= end; value++)
-                tasks.Add(ProbeAsync(IpAddressHelper.ToIp(value), throttler));
-
-            var probed = await Task.WhenAll(tasks);
-
-            var discovered = probed
-                .Where(r => r is not null)
-                .Select(r => r!)
-                .OrderBy(r => IpAddressHelper.TryParse(r.IpAddress, out var v) ? v : uint.MaxValue)
-                .ToList();
+            var discovered = await ScanRangeAsync(start, end);
 
             var macChanged = false;
             foreach (var host in discovered)
@@ -120,6 +108,47 @@ namespace Network.Management.App.Services
                 Discovered = discovered,
                 Missing = missing
             };
+        }
+
+        public async Task<IReadOnlyList<DiscoveredDeviceDto>> DetectUnknownAsync(CancellationToken cancellationToken = default)
+        {
+            var range = await _networkSettingService.GetAsync();
+
+            // The background monitor must never throw on a bad/oversized range: just report nothing.
+            if (!IpAddressHelper.TryParse(range.RangeStart, out var start)
+                || !IpAddressHelper.TryParse(range.RangeEnd, out var end)
+                || start > end
+                || (long)end - start + 1 > MaxScanSize)
+                return [];
+
+            var registeredIps = await _context.Devices
+                .Select(d => d.IpAddress)
+                .ToListAsync(cancellationToken);
+            var registeredSet = new HashSet<string>(registeredIps, StringComparer.OrdinalIgnoreCase);
+
+            var discovered = await ScanRangeAsync(start, end);
+            return discovered
+                .Where(h => !registeredSet.Contains(h.IpAddress))
+                .ToList();
+        }
+
+        // Pings every address in the range concurrently (throttled) and returns the live hosts,
+        // each enriched with its resolved MAC and reverse-DNS name, ordered by IP.
+        private async Task<List<DiscoveredDeviceDto>> ScanRangeAsync(uint start, uint end)
+        {
+            using var throttler = new SemaphoreSlim(MaxConcurrentProbes);
+            var tasks = new List<Task<DiscoveredDeviceDto?>>();
+
+            for (var value = start; value <= end; value++)
+                tasks.Add(ProbeAsync(IpAddressHelper.ToIp(value), throttler));
+
+            var probed = await Task.WhenAll(tasks);
+
+            return probed
+                .Where(r => r is not null)
+                .Select(r => r!)
+                .OrderBy(r => IpAddressHelper.TryParse(r.IpAddress, out var v) ? v : uint.MaxValue)
+                .ToList();
         }
 
         private async Task<DiscoveredDeviceDto?> ProbeAsync(string ipAddress, SemaphoreSlim throttler)

@@ -235,4 +235,224 @@ var locationList = document.getElementById('location-list');
             renderLocations(this.value);
         });
     }
+
+    // ===== Unregistered-device alerts (Admin/IT only) =====
+    // Polls the background monitor's findings and surfaces hosts that are on the network
+    // but not yet added to the app, via a topbar bell badge and a one-off toast.
+    function initNotifications() {
+        var btn = document.getElementById('notify-btn');
+        var panel = document.getElementById('notify-panel');
+        var backdrop = document.getElementById('notify-backdrop');
+        var closeBtn = document.getElementById('notify-close');
+        var badge = document.getElementById('notify-badge');
+        var list = document.getElementById('notify-list');
+        var statusList = document.getElementById('notify-status-list');
+        var statusSection = document.getElementById('notify-status-section');
+        var clearBtn = document.getElementById('notify-clear');
+        if (!btn || !panel || !badge || !list) return;
+
+        var desktop = window.matchMedia('(min-width: 1024px)');
+
+        function openPanel() {
+            panel.classList.add('is-open');
+            if (backdrop) backdrop.classList.add('is-open');
+        }
+
+        function closePanel() {
+            panel.classList.remove('is-open');
+            if (backdrop) backdrop.classList.remove('is-open');
+        }
+
+        function togglePanel() {
+            if (panel.classList.contains('is-open')) closePanel();
+            else openPanel();
+        }
+
+        // On desktop the drawer reveals itself automatically as alerts come in.
+        function autoReveal() {
+            if (desktop.matches) openPanel();
+        }
+
+        var unknownCount = 0;
+        var statusCount = 0;
+        var lastUnknownCount = null;
+        var lastStatusId = null;
+
+        function updateBadge() {
+            var total = unknownCount + statusCount;
+            if (total > 0) {
+                badge.textContent = total > 99 ? '99+' : total;
+                badge.hidden = false;
+                btn.classList.add('has-alerts');
+            } else {
+                badge.hidden = true;
+                btn.classList.remove('has-alerts');
+            }
+            if (clearBtn) clearBtn.hidden = total === 0;
+        }
+
+        function renderUnknown(data) {
+            var devices = (data && data.devices) || [];
+            unknownCount = (data && data.count) || 0;
+
+            if (!devices.length) {
+                list.innerHTML = '<div class="topbar__notify-empty">No unregistered devices detected.</div>';
+            } else {
+                list.innerHTML = devices.map(function (d) {
+                    return '<div class="topbar__notify-item">'
+                        + '<div class="topbar__notify-info">'
+                        + '<span class="topbar__notify-ip">' + escapeHtml(d.ipAddress) + '</span>'
+                        + '<span class="topbar__notify-name">' + escapeHtml(d.hostName || 'Unknown host') + '</span>'
+                        + '<span class="topbar__notify-mac">' + escapeHtml(d.macAddress || 'MAC unknown') + '</span>'
+                        + '</div>'
+                        + '<button type="button" class="topbar__notify-dismiss" title="Dismiss" aria-label="Dismiss" data-dismiss-ip="' + escapeHtml(d.ipAddress) + '">&times;</button>'
+                        + '</div>';
+                }).join('');
+            }
+
+            if (lastUnknownCount !== null && unknownCount > lastUnknownCount) {
+                var delta = unknownCount - lastUnknownCount;
+                window.showToast(delta + ' new device' + (delta !== 1 ? 's' : '') + ' detected on the network (not added to the app).', 'info');
+                autoReveal();
+            } else if (lastUnknownCount === null && unknownCount > 0) {
+                window.showToast(unknownCount + ' unregistered device' + (unknownCount !== 1 ? 's' : '') + ' on the network.', 'info');
+            }
+            lastUnknownCount = unknownCount;
+            updateBadge();
+        }
+
+        function renderStatus(data) {
+            var changes = (data && data.changes) || [];
+            var latestId = (data && data.latestId) || 0;
+            statusCount = (data && data.count) || 0;
+
+            if (statusSection) statusSection.hidden = statusCount === 0;
+            if (statusList) {
+                statusList.innerHTML = changes.map(function (c) {
+                    var isOnline = c.newStatus === 'Online';
+                    var dotClass = isOnline ? 'is-online' : 'is-offline';
+                    return '<div class="topbar__notify-item">'
+                        + '<div class="topbar__notify-info">'
+                        + '<span class="topbar__notify-name"><span class="topbar__notify-dot ' + dotClass + '"></span>' + escapeHtml(c.deviceName) + '</span>'
+                        + '<span class="topbar__notify-mac">' + escapeHtml(c.ipAddress) + ' &middot; ' + escapeHtml(c.previousStatus) + ' &rarr; ' + escapeHtml(c.newStatus) + '</span>'
+                        + '</div>'
+                        + '<button type="button" class="topbar__notify-dismiss" title="Dismiss" aria-label="Dismiss" data-dismiss-status="' + c.id + '">&times;</button>'
+                        + '</div>';
+                }).join('');
+            }
+
+            // Toast only for transitions newer than the last one we have seen. Establish a
+            // baseline silently on first load so we do not replay history when the page opens.
+            if (lastStatusId !== null) {
+                var fresh = changes
+                    .filter(function (c) { return c.id > lastStatusId; })
+                    .sort(function (a, b) { return a.id - b.id; });
+                fresh.forEach(function (c) {
+                    var online = c.newStatus === 'Online';
+                    window.showToast("Device '" + c.deviceName + "' is now " + c.newStatus + '.', online ? 'success' : 'error');
+                });
+                if (fresh.length) autoReveal();
+            }
+            lastStatusId = latestId;
+            updateBadge();
+        }
+
+        function pollUnknown() {
+            fetch('/api/devices/unknown')
+                .then(function (res) { return res.ok ? res.json() : null; })
+                .then(function (data) { if (data) renderUnknown(data); })
+                .catch(function () { /* transient failure; keep last state */ });
+        }
+
+        function pollStatus() {
+            fetch('/api/devices/status-changes')
+                .then(function (res) { return res.ok ? res.json() : null; })
+                .then(function (data) { if (data) renderStatus(data); })
+                .catch(function () { /* transient failure; keep last state */ });
+        }
+
+        function dismissUnknown(ip) {
+            fetch('/api/devices/unknown/dismiss', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ipAddress: ip })
+            })
+                .then(function (res) { return res.ok ? res.json() : null; })
+                .then(function (data) { if (data) renderUnknown(data); })
+                .catch(function () { /* transient failure */ });
+        }
+
+        function dismissStatus(id) {
+            fetch('/api/devices/status-changes/dismiss', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: Number(id) })
+            })
+                .then(function (res) { return res.ok ? res.json() : null; })
+                .then(function (data) { if (data) renderStatus(data); })
+                .catch(function () { /* transient failure */ });
+        }
+
+        function dismissAll() {
+            fetch('/api/devices/unknown/dismiss-all', { method: 'POST' })
+                .then(function (res) { return res.ok ? res.json() : null; })
+                .then(function (data) { if (data) renderUnknown(data); })
+                .catch(function () { /* transient failure */ });
+            fetch('/api/devices/status-changes/dismiss-all', { method: 'POST' })
+                .then(function (res) { return res.ok ? res.json() : null; })
+                .then(function (data) { if (data) renderStatus(data); })
+                .catch(function () { /* transient failure */ });
+        }
+
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            togglePanel();
+        });
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                closePanel();
+            });
+        }
+        if (backdrop) {
+            backdrop.addEventListener('click', function () {
+                closePanel();
+            });
+        }
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                dismissAll();
+            });
+        }
+        list.addEventListener('click', function (e) {
+            var target = e.target.closest ? e.target.closest('[data-dismiss-ip]') : null;
+            if (!target) return;
+            e.stopPropagation();
+            dismissUnknown(target.getAttribute('data-dismiss-ip'));
+        });
+        if (statusList) {
+            statusList.addEventListener('click', function (e) {
+                var target = e.target.closest ? e.target.closest('[data-dismiss-status]') : null;
+                if (!target) return;
+                e.stopPropagation();
+                dismissStatus(target.getAttribute('data-dismiss-status'));
+            });
+        }
+        document.addEventListener('click', function (e) {
+            if (panel.classList.contains('is-open') && !btn.contains(e.target) && !panel.contains(e.target)) {
+                closePanel();
+            }
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && panel.classList.contains('is-open')) closePanel();
+        });
+
+        pollUnknown();
+        pollStatus();
+        setInterval(pollUnknown, 45000);
+        setInterval(pollStatus, 20000);
+    }
+
+    initNotifications();
 });

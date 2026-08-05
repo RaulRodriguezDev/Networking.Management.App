@@ -35,6 +35,8 @@ builder.Services.AddScoped<IAccessControlService, AccessControlService>();
 // Reachability (real ICMP ping) + the background monitor that keeps device status in sync.
 builder.Services.AddSingleton<IReachabilityService, ReachabilityService>();
 builder.Services.AddSingleton<IMacAddressResolver, MacAddressResolver>();
+builder.Services.AddSingleton<IUnknownDeviceTracker, UnknownDeviceTracker>();
+builder.Services.AddSingleton<IStatusChangeTracker, StatusChangeTracker>();
 builder.Services.AddHostedService<DeviceMonitorService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

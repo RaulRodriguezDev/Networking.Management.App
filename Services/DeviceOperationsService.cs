@@ -11,13 +11,15 @@ namespace Network.Management.App.Services
         private readonly IAppLogger _logger;
         private readonly IDeviceService _deviceService;
         private readonly IReachabilityService _reachability;
+        private readonly IStatusChangeTracker _statusChanges;
 
-        public DeviceOperationsService(AppDbContext context, IAppLogger logger, IDeviceService deviceService, IReachabilityService reachability)
+        public DeviceOperationsService(AppDbContext context, IAppLogger logger, IDeviceService deviceService, IReachabilityService reachability, IStatusChangeTracker statusChanges)
         {
             _context = context;
             _logger = logger;
             _deviceService = deviceService;
             _reachability = reachability;
+            _statusChanges = statusChanges;
         }
 
         public async Task<ProbeResultDto?> ProbeAsync(int deviceId, int requestingUserId)
@@ -62,6 +64,9 @@ namespace Network.Management.App.Services
             var previous = device.Status;
             device.Status = newStatus;
             await _context.SaveChangesAsync();
+
+            // Surface the transition as an in-app notification (bell panel + toast).
+            _statusChanges.Record(device.DeviceId, DeviceLabel(device), device.IpAddress, previous, newStatus);
 
             var detail = $"Device '{DeviceLabel(device)}' changed from {previous} to {newStatus} (detected via connection probe).";
 

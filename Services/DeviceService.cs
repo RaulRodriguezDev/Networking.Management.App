@@ -13,12 +13,14 @@ namespace Network.Management.App.Services
         private readonly AppDbContext _context;
         private readonly IAppLogger _logger;
         private readonly INetworkSettingService _networkSettingService;
+        private readonly IUnknownDeviceTracker _unknownTracker;
 
-        public DeviceService(AppDbContext context, IAppLogger logger, INetworkSettingService networkSettingService)
+        public DeviceService(AppDbContext context, IAppLogger logger, INetworkSettingService networkSettingService, IUnknownDeviceTracker unknownTracker)
         {
             _context = context;
             _logger = logger;
             _networkSettingService = networkSettingService;
+            _unknownTracker = unknownTracker;
         }
 
         public async Task<IEnumerable<DeviceDto>> GetAllAsync()
@@ -169,6 +171,9 @@ namespace Network.Management.App.Services
 
             _context.Devices.Add(device);
             await _context.SaveChangesAsync();
+
+            // The device is now registered, so drop it from the unknown-device alerts immediately.
+            _unknownTracker.Remove(device.IpAddress);
 
             // The device is registered as Offline. It is provisioned on the network only when
             // explicitly connected (see ConnectAsync).

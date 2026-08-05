@@ -74,6 +74,39 @@
                 <span id="equipment-count" class="badge">0 devices</span>
                 <span id="online-count" class="badge badge--green">0 online</span>
                 <span id="offline-count" class="badge badge--red">0 offline</span>
+                @if (User.IsInRole("Admin") || User.IsInRole("IT"))
+                {
+                    <div class="topbar__notify" id="notify-root">
+                        <button type="button" class="topbar__btn topbar__notify-btn" id="notify-btn"
+                                title="Network alerts" aria-label="Network alerts">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2">
+                                <path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                                <path d="M13.73 21a2 2 0 01-3.46 0" />
+                            </svg>
+                            <span class="topbar__notify-badge" id="notify-badge" hidden>0</span>
+                        </button>
+                        <div class="topbar__notify-backdrop" id="notify-backdrop"></div>
+                        <div class="topbar__notify-panel" id="notify-panel">
+                            <div class="topbar__notify-header">
+                                <span>Notifications</span>
+                                <div class="topbar__notify-actions">
+                                    <button type="button" class="topbar__notify-clear" id="notify-clear" hidden>Dismiss all</button>
+                                    <button type="button" class="topbar__notify-close" id="notify-close" title="Close" aria-label="Close">&times;</button>
+                                </div>
+                            </div>
+                            <div class="topbar__notify-section" id="notify-status-section" hidden>
+                                <div class="topbar__notify-subheader">Device status changes</div>
+                                <div class="topbar__notify-list" id="notify-status-list"></div>
+                            </div>
+                            <div class="topbar__notify-section">
+                                <div class="topbar__notify-subheader">Unregistered devices on the network</div>
+                                <div class="topbar__notify-list" id="notify-list"></div>
+                            </div>
+                            <a class="topbar__notify-footer" asp-controller="Admin" asp-action="Devices">Manage in Devices</a>
+                        </div>
+                    </div>
+                }
                 <div class="topbar__separator"></div>
                 <div class="topbar__user">
                     @if (User.Identity is { IsAuthenticated: true })
