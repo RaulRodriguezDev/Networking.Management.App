@@ -30,6 +30,7 @@ builder.Services.AddScoped<IVlanService, VlanService>();
 builder.Services.AddScoped<IDeviceOperationsService, DeviceOperationsService>();
 builder.Services.AddScoped<IDeviceDiscoveryService, DeviceDiscoveryService>();
 builder.Services.AddScoped<ILogService, LogService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IAccessControlService, AccessControlService>();
 
 // Reachability (real ICMP ping) + the background monitor that keeps device status in sync.

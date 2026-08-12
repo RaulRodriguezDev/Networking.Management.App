@@ -65,7 +65,7 @@
             <p>Manage hospital departments, floors, and network zones.</p>
         </a>
 
-        <div class="admin__card admin__card--reports">
+        <a asp-controller="Admin" asp-action="Reports" class="admin__card admin__card--link admin__card--reports">
             <span class="admin__card-icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                      stroke="currentColor" stroke-width="2">
@@ -76,7 +76,7 @@
             </span>
             <h3>Reports</h3>
             <p>View uptime reports, device health history, and network analytics.</p>
-        </div>
+        </a>
 
         <a asp-controller="Admin" asp-action="Logs" class="admin__card admin__card--link admin__card--logs">
             <span class="admin__card-icon">

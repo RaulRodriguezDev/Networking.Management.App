@@ -39,6 +39,11 @@ namespace Network.Management.App.Controllers
         {
             return View();
         }
+
+        public IActionResult Reports()
+        {
+            return View();
+        }
     }
 }
 

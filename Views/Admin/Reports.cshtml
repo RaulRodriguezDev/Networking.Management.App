@@ -1,0 +1,77 @@
+@{
+    ViewData["Title"] = "Reports";
+}
+
+<section class="reports" id="reports-page">
+    <div class="reports__header">
+        <div class="reports__header-info">
+            <a asp-controller="Admin" asp-action="Index" class="reports__back" title="Back to Administration">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5" />
+                    <path d="M12 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div>
+                <h2>Reports &amp; Analytics</h2>
+                <p>Network-wide device health, distribution, and recent activity at a glance.</p>
+            </div>
+        </div>
+        <div class="reports__header-actions">
+            <span class="reports__generated" id="reports-generated"></span>
+            <button type="button" class="btn btn--ghost" id="reports-refresh">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 4v6h-6" />
+                    <path d="M1 20v-6h6" />
+                    <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+                </svg>
+                <span>Refresh</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="reports__summary" id="reports-summary"></div>
+
+    <div class="reports__grid">
+        <div class="reports__card">
+            <h3 class="reports__card-title">Devices by type</h3>
+            <div class="reports__bars" id="reports-by-type"></div>
+        </div>
+        <div class="reports__card">
+            <h3 class="reports__card-title">Devices by location</h3>
+            <div class="reports__bars" id="reports-by-location"></div>
+        </div>
+        <div class="reports__card">
+            <h3 class="reports__card-title">Devices by VLAN</h3>
+            <div class="reports__bars" id="reports-by-vlan"></div>
+        </div>
+        <div class="reports__card">
+            <h3 class="reports__card-title">Activity by category</h3>
+            <div class="reports__bars" id="reports-by-category"></div>
+        </div>
+        <div class="reports__card">
+            <h3 class="reports__card-title">Top actions</h3>
+            <div class="reports__bars" id="reports-top-actions"></div>
+        </div>
+    </div>
+
+    <div class="reports__card reports__card--wide">
+        <div class="reports__card-head">
+            <h3 class="reports__card-title">Recent status changes</h3>
+            <span class="reports__pill" id="reports-recent-count"></span>
+        </div>
+        <div class="reports__table-wrap">
+            <table class="reports__table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Device</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody id="reports-status-tbody">
+                    <tr><td colspan="3" class="ui-state__cell">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
