@@ -73,7 +73,7 @@
     height: 46px;
     border-radius: 12px;
     color: var(--accent);
-    background: rgba(99, 138, 217, 0.14);
+    background: var(--accent-bg);
     transition: transform var(--transition);
 }
 
@@ -100,7 +100,7 @@
 
 .admin__card--link:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 12px 28px var(--shadow-md);
 }
 
 .admin__card--link:hover .admin__card-icon {

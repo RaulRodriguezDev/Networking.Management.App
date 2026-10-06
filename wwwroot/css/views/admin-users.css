@@ -134,17 +134,17 @@
 }
 
 .role-badge--admin {
-    background: rgba(248, 113, 113, 0.12);
+    background: var(--red-bg);
     color: var(--red);
 }
 
 .role-badge--it {
-    background: rgba(99, 138, 217, 0.15);
+    background: var(--accent-bg);
     color: var(--accent);
 }
 
 .role-badge--guest {
-    background: rgba(52, 211, 153, 0.12);
+    background: var(--green-bg);
     color: var(--green);
 }
 
@@ -164,13 +164,13 @@
 
 .btn--primary {
     background: var(--accent);
-    color: #fff;
+    color: var(--text-on-accent);
 }
 
 .btn--primary:hover {
     background: var(--accent-hover);
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(99, 138, 217, 0.3);
+    box-shadow: 0 6px 16px var(--accent-shadow);
 }
 
 .btn svg {
@@ -194,7 +194,7 @@
 
 .btn--danger {
     background: var(--red);
-    color: #fff;
+    color: var(--text-on-accent);
 }
 
 .btn--danger:hover {
@@ -222,7 +222,7 @@
 }
 
 .icon-btn--edit:hover {
-    background: rgba(99, 138, 217, 0.14);
+    background: var(--accent-bg);
     border-color: var(--accent);
     color: var(--accent);
 }
@@ -256,7 +256,7 @@
 .modal__backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.55);
+    background: var(--overlay);
     backdrop-filter: blur(2px);
 }
 
@@ -269,7 +269,7 @@
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 20px 50px var(--shadow-lg);
     animation: modal-in 0.2s ease;
 }
 
@@ -415,7 +415,7 @@
 
 .role-card--selected {
     border-color: var(--accent);
-    background: rgba(99, 138, 217, 0.12);
+    background: var(--accent-bg);
 }
 
 .role-card--selected svg,
@@ -445,7 +445,7 @@
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-left-width: 3px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 24px var(--shadow-lg);
     color: var(--text-primary);
     font-size: 0.85rem;
     opacity: 0;

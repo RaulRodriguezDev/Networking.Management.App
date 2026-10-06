@@ -61,7 +61,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddWebOptimizer(pipeline =>
 {
     pipeline.AddCssBundle("/css/bundle.css", "css/layout.css", "css/views/*.css");
-    pipeline.AddJavaScriptBundle("/js/bundle.js", "js/layout.js", "js/views/*.js");
+    pipeline.AddJavaScriptBundle("/js/bundle.js", "js/layout.js", "js/theme.js", "js/views/*.js");
 });
 
 var app = builder.Build();

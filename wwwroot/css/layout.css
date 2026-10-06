@@ -58,6 +58,37 @@
     --transition: 0.25s ease;
 }
 
+    /* Accent/background/shadow helpers */
+    --accent-bg: rgba(99, 138, 217, 0.14);
+    --accent-shadow: rgba(99, 138, 217, 0.3);
+    --shadow-sm: rgba(0, 0, 0, 0.05);
+    --shadow-md: rgba(0, 0, 0, 0.25);
+    --shadow-lg: rgba(0, 0, 0, 0.4);
+    --overlay: rgba(0, 0, 0, 0.55);
+/* Light theme overrides */
+.theme-light {
+    --bg-body: #ffffff;
+    --bg-sidebar: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f4f6f8;
+    --bg-topbar: #ffffff;
+    --bg-input: #ffffff;
+    --border: #e6eaf0;
+    --border-active: #3b82f6;
+    --text-primary: #0f172a;
+    --text-secondary: #374151;
+    --text-muted: #6b7280;
+    --text-on-accent: #fff;
+    --accent: #3b82f6;
+    --accent-hover: #60a5fa;
+    --green: #059669;
+    --text-on-accent: #fff;
+    --green-bg: rgba(5,150,105,0.08);
+    --red: #dc2626;
+    --red-bg: rgba(220,38,38,0.08);
+    --orange: #f97316;
+}
+
 html, body {
     height: 100%;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -165,7 +196,7 @@ body {
 }
 
 .sidebar__nav-item.active {
-    background: rgba(99, 138, 217, 0.12);
+    background: var(--accent-bg);
     color: var(--accent);
     font-weight: 600;
 }
@@ -447,6 +478,24 @@ body {
     align-items: center;
 }
 
+.topbar__theme-btn {
+    width: 38px;
+    height: 38px;
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.topbar__theme-btn:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+}
+
 /* ===== Topbar notification bell ===== */
 .topbar__notify {
     position: relative;
@@ -471,7 +520,7 @@ body {
     padding: 0 4px;
     border-radius: 20px;
     background: var(--red);
-    color: #fff;
+    color: var(--text-on-accent);
     font-size: 0.62rem;
     font-weight: 700;
     line-height: 16px;
@@ -489,7 +538,7 @@ body {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 8px 24px var(--shadow-lg);
     z-index: 60;
     overflow: hidden;
 }
@@ -687,7 +736,7 @@ body {
         border: none;
         border-left: 1px solid var(--border);
         border-radius: 0;
-        box-shadow: -12px 0 32px rgba(0, 0, 0, 0.4);
+        box-shadow: -12px 0 32px var(--shadow-lg);
         transform: translateX(100%);
         transition: transform 0.28s ease;
     }
@@ -700,7 +749,7 @@ body {
         display: block;
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.4);
+        background: var(--overlay);
         z-index: 59;
     }
 

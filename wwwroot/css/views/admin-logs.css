@@ -65,7 +65,7 @@
 }
 
 .logs__tab--active {
-    background: rgba(99, 138, 217, 0.15);
+    background: var(--accent-bg);
     border-color: var(--accent);
     color: var(--accent);
 }
@@ -205,17 +205,17 @@
 }
 
 .log-badge--auth {
-    background: rgba(251, 191, 36, 0.12);
+    background: var(--yellow-bg);
     color: var(--yellow);
 }
 
 .log-badge--device {
-    background: rgba(99, 138, 217, 0.15);
+    background: var(--accent-bg);
     color: var(--accent);
 }
 
 .log-badge--app {
-    background: rgba(52, 211, 153, 0.12);
+    background: var(--green-bg);
     color: var(--green);
 }
 

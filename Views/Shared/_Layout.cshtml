@@ -4,6 +4,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - NetMonitor</title>
+    <script>
+        (function(){
+            try {
+                var t = localStorage.getItem('theme');
+                if (!t) {
+                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) t = 'theme-light';
+                    else t = 'theme-dark';
+                }
+                document.documentElement.classList.add(t);
+            } catch (e) { }
+        })();
+    </script>
     <link rel="stylesheet" href="/css/bundle.css" />
 </head>
 <body>
@@ -71,6 +83,34 @@
                 <h2 id="topbar-title">Select a location</h2>
             </div>
             <div class="topbar__right">
+                <button id="theme-toggle" class="topbar__btn topbar__theme-btn" title="Toggle theme" aria-pressed="false" aria-label="Toggle light/dark mode">
+                    <!-- icon set by script -->
+                </button>
+                <script>
+                    (function(){
+                        try {
+                            var btn = document.getElementById('theme-toggle');
+                            if (!btn) return;
+                            function isLight(){ return document.documentElement.classList.contains('theme-light'); }
+                            function update(){
+                                var light = isLight();
+                                btn.setAttribute('aria-pressed', light? 'true':'false');
+                                btn.innerHTML = light
+                                    ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>'
+                                    : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
+                            }
+                            btn.addEventListener('click', function(){
+                                var light = !document.documentElement.classList.contains('theme-light');
+                                if (light){ document.documentElement.classList.add('theme-light'); document.documentElement.classList.remove('theme-dark'); localStorage.setItem('theme','theme-light'); }
+                                else { document.documentElement.classList.remove('theme-light'); document.documentElement.classList.add('theme-dark'); localStorage.setItem('theme','theme-dark'); }
+                                update();
+                                // force reload CSS to ensure styles apply (helps with some caching scenarios)
+                                try{ var links = document.querySelectorAll('link[rel=stylesheet]'); links.forEach(function(l){ var href = l.getAttribute('href'); if (href){ l.setAttribute('href', href.split('?')[0] + '?v=' + Date.now()); }}); }catch(e){}
+                            });
+                            update();
+                        }catch(e){ }
+                    })();
+                </script>
                 <span id="equipment-count" class="badge">0 devices</span>
                 <span id="online-count" class="badge badge--green">0 online</span>
                 <span id="offline-count" class="badge badge--red">0 offline</span>
@@ -155,6 +195,7 @@
     <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
     <script src="/js/bundle.js"></script>
+    <script src="/js/theme.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
